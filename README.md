@@ -1,1 +1,1 @@
-Just write
+Just write @see wiki
