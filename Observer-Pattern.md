@@ -1,0 +1,1 @@
+I code the [Observer Pattern](https://github.com/chengkehan/unityLab/blob/master/src/jc/Subjects.cs) before.<br> But the message is a weakly typed object that we must cast it as another type which we need.<br>It's unsafe and troublesome. <br>So the [Strong Type Observer Pattern](https://github.com/chengkehan/unityLab/blob/master/src/jc/StrongTypeSubjects.cs) was born:)

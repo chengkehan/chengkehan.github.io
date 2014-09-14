@@ -1,0 +1,9 @@
+-A tool to build ".unity3d" asset bundle by simple config and one key build.
+"sample config1":https://github.com/chengkehan/unityLab/blob/master/src/jc/BuildAssetBundle.xml
+"sample config2":https://github.com/chengkehan/unityLab/blob/master/src/jc/BuildAssetBundle2.xml
+"build plugin":https://github.com/chengkehan/unityLab/blob/master/src/jc/BuildAssetBundle.cs-
+
+A new toolkit for building assetBundle was born.
+There are two interfaces to use, UI or Commandline.
+"A quick guide of document's preview is here.":https://github.com/chengkehan/unityLab/blob/master/src/jc/Editor/doc.jpg
+And you can get all of these by "download jc.unitypackage":https://github.com/chengkehan/unityLab/blob/master/jc.unitypackage
