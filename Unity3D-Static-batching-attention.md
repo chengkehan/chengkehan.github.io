@@ -1,0 +1,1 @@
+In Unity3d, if a mono script was added to the gameobject, then the static batching would not became effective to the mesh, material etc..
