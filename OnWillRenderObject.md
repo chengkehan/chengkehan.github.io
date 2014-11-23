@@ -1,21 +1,22 @@
-using UnityEngine;
-using System.Collections;
+	using UnityEngine;
 
-public class CheckWhetherInRendering : MonoBehaviour {
+	using System.Collections;
 
-	public bool isRendering=false;
-    private float lastTime=0;
-    private float curtTime=0;
+	public class CheckWhetherInRendering : MonoBehaviour 
+	{
+		public bool isRendering=false;
+		private float lastTime=0;
+		private float curtTime=0;
+		
+		void Update()
+		{
+		    isRendering=curtTime!=lastTime?true:false;
+		    lastTime=curtTime;
+		}
+		
+		void OnWillRenderObject()
+		{
+		    curtTime=Time.time;
+		}
 
-    void Update()
-    {
-	    isRendering=curtTime!=lastTime?true:false;
-	    lastTime=curtTime;
-    }
-
-    void OnWillRenderObject()
-    {
-	    curtTime=Time.time;
-    }
-
-}
+	}
