@@ -1,5 +1,7 @@
 #Direct3D 12 Note Part 1
 
+**2016-1-9**
+
 Direct3D 12 提供了一个更低层的硬件抽象，它能让开发者显著的提高多线程CPU利用率。使用Direct3D 12 的时候，开发者需要自己进行内存管理。另外，使用Direct3D 12，还能够减少GPU开销，得益于**Command Queues and Lists**，**Descriptor Tables**，**Pipleline State Objects**这些功能。
 
 Direct3D 12对于图形开发者来说主要提供了四个好处：极大地减少了CPU消耗，显著改善了电量消耗，提高了大约20%的GPU效率，适用于所有Windows10设备（PC，tablet，console，phone）。
