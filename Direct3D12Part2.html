@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Direct3D 12 Note Part 2</h1>
+
+<p><strong>2016-1-10</strong></p>
+
+<p>一个基础的 Direct3D 12 程序的流程</p>
+
+<ul>
+<li>Initialize（初始化）</li>
+<li>Repeat（不断重复下面两个步骤）
+
+<ul>
+<li>Update（更新）</li>
+<li>Render（渲染）</li>
+</ul>
+</li>
+<li>Destroy（销毁）</li>
+</ul>
+
+
+<p>Initialize（初始化）</p>
+
+<ul>
+<li>Initialize the pipeline 初始化管线
+
+<ul>
+<li>启用 Debug Layer（调试）</li>
+<li>创建设备（Device）</li>
+<li>创建命令队列（Command Queue）</li>
+<li>创建交换链（Swap Chain）</li>
+<li>创建 Render Target View Descriptor Heap
+
+<ul>
+<li>一个 Descriptor Heap 可以认为是一个 Descriptor 数组。每一个 Descriptor 都对 GPU 描述了一个对象。</li>
+</ul>
+</li>
+<li>创建帧资源（Frame Resources）。每一帧渲染需要的Render Target View。</li>
+<li>创建命令分配器（Command Allocator）
+
+<ul>
+<li>命令分配器（Command Allocator）为命令队列（Command List）和命令束（Command Bundles）管理其下的所有存储。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>初始化资源（Initialize The Assets）
+
+<ul>
+<li>创建一个空的根签名（Root Signature）
+
+<ul>
+<li>一个图形根签名定义了何种类型的资源被关联到了图形管线（Graphics Pipeline）</li>
+</ul>
+</li>
+<li>编译 Shaders</li>
+<li>创建定点输入格式布局（Vertex Input Layout）</li>
+<li>创建管线状态对象（Pipeline State Object）描述。
+
+<ul>
+<li>管线状态对象时维护着所有当前 Shaders 的状态，以及某种固定管线状态对象（比如Input Assembler,tesselator,rasterizer和output merger）。</li>
+</ul>
+</li>
+<li>创建命令队列（Command List）。</li>
+<li>关闭命令队列（Command List）。</li>
+<li>创建加载顶点缓冲（Vertex Buffers）。</li>
+<li>创建 Vertex Buffer Views。</li>
+<li>创建 Fence
+
+<ul>
+<li>Fence 是用来同步 CPU 和 GPU的。</li>
+</ul>
+</li>
+<li>创建事件句柄（Event Handle）。</li>
+<li>等待 GPU 完成。
+
+<ul>
+<li>检测 Fence。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Update（更新）</p>
+
+<ul>
+<li>更新这一帧需要更新的所有东西（程序业务逻辑以及显示相关的）</li>
+</ul>
+
+
+<p>Render（渲染）</p>
+
+<ul>
+<li>填充命令列表（Command List）
+
+<ul>
+<li>重置命令列表分配器（Command List Allocator）
+
+<ul>
+<li>重用命令分配器（Command Allocator）已经分配的内存。</li>
+</ul>
+</li>
+<li>重置命令列表（Command List）</li>
+<li>设置图形根签名（Graphics Root Signature）</li>
+<li>设置视口（Viewport）和裁切矩形（Scissor Rectangle）</li>
+<li>设置一个 Resource Barrier，指示 Back Buffer 被用来作为渲染目标（Render Target）
+
+<ul>
+<li>Resource Barriers 是用来管理资源过度？（Resource Transitions）</li>
+</ul>
+</li>
+<li>将命令记录到命令列表中（Command List）</li>
+<li>指示在命令列表（Command List）执行完成后， Back Buffer 将会被用来显示。
+
+<ul>
+<li>需要设置Resource Barrier（Another call to set resouces barrier）。</li>
+</ul>
+</li>
+<li>关闭命令列表（Command List）</li>
+</ul>
+</li>
+<li>执行命令列表（Command List）</li>
+<li>显示一帧</li>
+<li>等待 GPU 完成
+
+<ul>
+<li>等待并且检测 Fence</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Destroy（销毁）</p>
+
+<ul>
+<li>清理关闭应用程序
+
+<ul>
+<li>等待 GPU 完成（检测 Fence）</li>
+<li>关闭事件句柄（Event Handle）</li>
+</ul>
+</li>
+</ul>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>
