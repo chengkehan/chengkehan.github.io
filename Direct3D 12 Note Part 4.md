@@ -1,4 +1,4 @@
-#Direct3D 12 Note Part 3
+#Direct3D 12 Note Part 4
 
 **2016-1-21**
 
