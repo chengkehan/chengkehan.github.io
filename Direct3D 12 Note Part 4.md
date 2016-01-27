@@ -25,3 +25,5 @@ Direct3D 11 到 Direct3D 12 的一个最大的变化是不在有一个关联到�
 要在 GPU 上执行任务，应用程序必须明确的提交 Command List 到 Command Queue 中， Command Queue 是关联到 Direct3D Device的。一个 Direct Command List 在提交后可以被执行多次，但是，应用程序有责任来确保 Direct Command List 再次被提交前，已经完成了上次所有工作。Bundles 没有并行使用限制，可以同时被多个 Command List 执行多次，但是 Bundles 不能被直接提交到 Command Queue 中。
 
 任何时候任何线程都可以提交 Command List 到 Command Queue，运行时会自动按照提交的顺序来序列化数据。
+
+![image](Direct3D12Part4/IC832965.png)
