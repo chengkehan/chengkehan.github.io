@@ -36,4 +36,6 @@
 
 对于使用 PSO 来设置的图形管线状态，这些状态都不会被 Direct Command List 和 Bundles 所继承。Direct Command List 和 Bundles 的初始图形管线状态是在创建的时候决定的。如果创建的时候没有指定 PSO，那么会使用默认的状态。也可以有接口来改变 Command List 内部的当前 PSO。
 
-## To Be Continue
+对于不是使用 PSO 来设置的图形管线状态，都会被 Bundles 所继承，除了图源拓扑类型。
+
+在 Command List 和 Bundles 中设置的资源绑定是持续存在的。
