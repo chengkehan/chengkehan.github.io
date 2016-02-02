@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Direct3D 12 Note Part 8</h1>
+
+<p><strong>2016-2-2</strong></p>
+
+<h2>冗余的资源绑定</h2>
+
+<p>在分析了多个游戏后，我们发现，通常游戏在这一帧和下一帧都会使用相同的一串绘图指令。不仅仅是指令，对比两帧中进行的绑定操作也是基本相同的。所以如果可以将这些绑定操作缓存起来将会得到很大的性能提升。</p>
+
+<p>当让，不能简单的将一连串的绑定操作直接缓存起来，因为其中可能有一两步绑定操作在下一帧中会发生变化，造成上一帧的缓存没有用了。那么如何解决这个问题呢，下面会逐步说明。</p>
+
+<h3>描述符（Descriptor）</h3>
+
+<p>什么事 Descriptor ？Descriptor 定义了各种参数来描述一种资源。</p>
+
+<p><img src="Direct3D12Part8/Picture1.png" alt="image" /></p>
+
+<p>比如上图中，Texture 的 Descriptor 定义了纹理的几个参数。</p>
+
+<h3>堆（Heaps）</h3>
+
+<p><img src="Direct3D12Part8/Picture2.png" alt="image" /></p>
+
+<p>Heaps 是由很多个 Descriptor 组成的大型数组（如上图）。在 Direct3D 11 中，你无法复用 Descriptor，只能创建一个新的或者完全复制一个 Descriptor。现在通过 Heaps 就能做到对 Descriptor 的复用。Heaps 中的 Descriptor 的顺序完全是由应用程序控制的。Heap 的尺寸大小根据 GPU 的架构会有所区别，越低端的 GPU 所能容纳的 Heap 尺寸越小，所以 Direct3D 12 允许在多个 Heap 之间进行切换。但是在某些 GPU 上切换 Heap 会导致一次刷新（Flush），所以最好减少这么做的次数。</p>
+
+<h3>表（Tables）</h3>
+
+<p><img src="Direct3D12Part8/Picture3.png" alt="image" /></p>
+
+<p>Tables 记录了 Heaps 中的一个起始点和一个尺寸（如上图）。现代的硬件，Direct3D 12 可以让 PSO 中的每一个 Shader 阶段都有多个 Tables。比如你可以同一个 Tables 来记录经常发生变化的操作，另一个 Tables 记录不变的操作。</p>
+
+<h3>减少资源绑定，提高效率</h3>
+
+<p>Direct3D 11</p>
+
+<p><img src="Direct3D12Part8/Picture4.png" alt="image" /></p>
+
+<p>Direct3D 12</p>
+
+<p><img src="Direct3D12Part8/Picture5.png" alt="image" /></p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
