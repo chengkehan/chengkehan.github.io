@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>自动解析、生成XML数据结构对应的代码</h1>
+
+<p><strong>2016-2-28</strong></p>
+
+<p>游戏开发中经常会用到 XML 来存储配置数据，在游戏运行时，会加载 XML 文件并且解析其中的内容，以便在游戏中使用。以前我都是手工编写解析 XML 的代码，而且 XML 数据结构对应的代码也都是手工编写的。</p>
+
+<p>比如有个这样的 XML</p>
+
+<pre><code>&lt;root&gt;
+    &lt;node name="a" width="100" height="200"&gt;&lt;/object&gt;
+    &lt;node name="b" width="300" height="400"&gt;&lt;/object&gt;
+&lt;/root&gt;
+</code></pre>
+
+<p>那么就需要手工写一个类</p>
+
+<pre><code>class Node
+{
+    string name;
+    int width;
+    int height;
+}
+</code></pre>
+
+<p>还需要手工写一段解析 XML 的代码</p>
+
+<pre><code>XmlParser parser = new XmlParser(xmlStr);
+List nodes = parser.doc.Nodes("root/node");
+foreach(var node in nodes)
+{
+    // 解析每一个node，并获取存储其属性
+}
+</code></pre>
+
+<p>如果需要处理的 XML 文件非常多的时候，就需要手工编写很多类似的代码。这些代码的功能都是重复而且单一的，造成了时间上的浪费，而且还很容易出错，需要额外的调试时间。那么如果能把这部分时间节省下来，就能提高很多开发效率。</p>
+
+<p>于是，就有了编写一个能够自动解析、生成 XML 数据结构对应的代码的想法。主要的功能是，能够自动生成所有的数据结构代码，并且能够自动解析完成，并且将读取的数据填充到生成的数据结构代码中。下面会逐步开始设计这个功能，并应用到项目中。</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
