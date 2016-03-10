@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>纹理投射 Projective Texturing</h1>
+
+<p><strong>2016-3-10</strong></p>
+
+<p>所谓纹理投射，是将坐标点投射到屏幕空间中的某个uv点，对屏幕空间中的纹理进行采样的技术。投射到的屏幕空间并不一定是当前正在渲染的屏幕空间，也可以是另一个虚拟的屏幕空间。</p>
+
+<pre><code>pos = matrix_mvp * vertex
+screen_space_uv = pos.xy / pos.z * 0.5 + 0.5
+</code></pre>
+
+<p>具体是渲染到当前正在渲染的屏幕空间还是另一个虚拟的屏幕空间，区别就是 matrix_mvp 这个矩阵的差别了。当然上面的伪代码还有待改善，只是说明功能（<a href="ComputeScreenPos.html">详见这里</a>）。</p>
+
+<p>在 Unity 中可以很容易的从 Camera 中获取到这个 matrix_mvp 矩阵，可以是当前正在渲染的 Camera，或者是另一个虚拟的 Camera。但是如果不是 Unity 这种便利的引擎，那你就需要自己来构造 mvp 矩阵了。</p>
+
+<p>Model 矩阵很容易，就是模型的 Transform（Rotation, Scale, Translate） 变换。</p>
+
+<p>View 矩阵：</p>
+
+<p><img src="ProjectiveTexturing/view.png" alt="image" /></p>
+
+<p>Projection 矩阵：</p>
+
+<p><img src="ProjectiveTexturing/projection.png" alt="image" /></p>
+
+<p>将 uv 映射到 0 到 1 的单位内：</p>
+
+<p><img src="ProjectiveTexturing/clamp.png" alt="image" /></p>
+
+<p>最后将这几个矩阵连乘起来，就可以得到一个最终的矩阵。将这个矩阵在 vertex shader 里作用到模型的顶点坐标上，然后在 fragment shader 里使用 tex2Dproj 或者 tex2D （<a href="ComputeScreenPos.html">详见这里</a>）对屏幕空间的纹理进行采样即可。</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
