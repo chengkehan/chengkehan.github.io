@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>色彩空间</h1>
+
+<p><strong>2016-3-17</strong></p>
+
+<p>关于 Gamma Correction 和 Linear Rendering，在<a href="http://blog.csdn.net/candycat1992/article/details/46228771">candycat的文章</a>以及<a href="http://docs.unity3d.com/Manual/LinearLighting.html">Unity的官方文档</a>，中已经说明的很清楚了。由于目前移动设备暂不支持 Linear Rendering，所以关于这一块的内容对于移动开发就没有经常得被提及。其实不管怎样，使用哪一种色彩空间，最终的原则就是最终显示出来的效果要和美术的效果一致，要和自己构想的效果一致，要完全清楚当前在做什么，要怎么做。能够做到这几点，你就能自如灵活运用了。</p>
+
+<p>这里只说一下 Unity 纹理导入时的 <code>Bypass sRGB Sampling</code> 选项。一般情况下我们都不会去勾选，只有在纹理中的像素值有具体的含义时才需要勾选，比如遮罩纹理、查表纹理等。</p>
+
+<p>当然如果当前是在 Gamma 色彩空间下，勾不勾选就没有区别了。这也是以前的一个疑惑点，在此记录下。</p> 
+      </section>
+    </div>
+
+    
+  </body>
+</html>
