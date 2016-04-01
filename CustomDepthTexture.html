@@ -54,13 +54,25 @@ _CameraDepthTexture
 <p>下面是关键的 Shader 代码，其实还是很简单的，自己用 Camera 的 Shader Replacement 来渲染。</p>
 
 <pre><code>// vertex:
-o.depth = o.pos.z;
+## o.depth = o.pos.z; // 这是错误的
+o.depth = -mul(UNITY_MATRIX_MV, i.vertex).z; // 这是正确的
 
 // fragment:
-float n = _ProjectionParams.y;
-float f = _ProjectionParams.z;
-float c = (i.depth - n) / f;
-return c;
+// 这是错误的
+{
+    ## float n = _ProjectionParams.y;
+    ## float f = _ProjectionParams.z;
+    ## float c = (i.depth - n) / f;
+    ## return c;
+}
+// 这是正确的
+{
+    float f = _ProjectionParams.z;
+    float c = i.depth / f;
+}
+
+以上代码中标记为错误的原因是，在投影空间中计算深度的，但是投影空间中的z值不是线性变化的。
+修改以后的正确版本，是在摄像机空间计算深度，0为眼睛位置的深度，1为远平面的深度。这样就和UnityCG中的效果一致了。
 </code></pre>
 
 <p>下面是渲染的效果</p>
