@@ -153,8 +153,8 @@ blockquote {
 }
 
 pre {
-  background: rgba(0, 0, 0, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(39, 40, 34, 1);
+  border: 1px solid rgba(39, 40, 34, 1);
   padding: 10px;
   font-size: 14px;
   color: #b5e853;
