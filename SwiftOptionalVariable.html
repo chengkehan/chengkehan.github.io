@@ -36,6 +36,18 @@
 
 <p>我结合自己的理解简单总结下。对于非 Optional 变量，必须在声明时或者构造函数中进行初始化，而有些变量是无法一开始就进行初始化的，所以无法写成 <code>var obj:Type</code>，编译器会报错。这时候就需要写成 <code>var obj:Type?</code>，表示这个值会在以后的某个时间进行初始化，并使用一个Wrapper类型的对象来代替。既然是一个Wrapper对象，所以在读写的时候需要解包和封包。<code>?</code> 表示了安全的解包，<code>!</code>表示了非安全的解包（解包失败会Crash） 。如果在声明时使用 <code>!</code>，像是这样 <code>var obj:Type!</code>，那么在解包时就无需手动加上 <code>!</code> 或者 <code>?</code>，编译器会自动替我们做这些事情。</p>
       </section>
+      <div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
     </div>
 
     

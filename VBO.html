@@ -41,6 +41,18 @@
 
 <p>有一种情况使得注意，可能会成为一个潜在的问题。就是当前帧 GPU 整在读取 VBO 数据时，CPU 这时正在进行下一帧的计算，而计算步骤中需要修改VBO，但是这时 GPU 正在读取这个 VBO，这时底层接口就有可能会暂时挂起 CPU ，直到 GPU 完整当前帧。</p>
       </section>
+      <div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
     </div>
 
     

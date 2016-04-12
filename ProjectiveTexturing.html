@@ -57,6 +57,18 @@ screen_space_uv = pos.xy / pos.z * 0.5 + 0.5
 
 <p>最后将这几个矩阵连乘起来，就可以得到一个最终的矩阵。将这个矩阵在 vertex shader 里作用到模型的顶点坐标上，然后在 fragment shader 里使用 tex2Dproj 或者 tex2D （<a href="ComputeScreenPos.html">详见这里</a>）对屏幕空间的纹理进行采样即可。</p>
       </section>
+      <div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
     </div>
 
     
