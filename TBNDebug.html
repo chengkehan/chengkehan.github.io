@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>显示切线空间</h1>
+
+<p><strong>2016-4-16</strong></p>
+
+<p>有些情况下我想要把模型的切线空间显示出来，法线、切线、付切线、或者三者都显示。这样做主要是为了调试用，因为有的模型光照效果总是有问题，检查了 Shader 的计算后没有任何问题，最后定位到是模型本身的法线有问题，所以最快捷的方法就是直接在 Unity 中把法线显示出来。这样立即就能看到问题的所在了。</p>
+
+<p><img src="TBNDebug/1.jpg" alt="img" /></p>
+
+<p>下面是关键的代码</p>
+
+<pre><code>Vector3[] vertices = mesh.vertices;
+Matrix4x4 l2w = meshFilter.transform.localToWorldMatrix;
+Matrix4x4 l2w_v = l2w.inverse.transpose;
+DrawVectors(vertices, ref l2w, ref l2w_v, mesh.normals, Color.blue);
+
+private void DrawVectors(Vector3[] vertices, ref Matrix4x4 l2w, ref Matrix4x4 l2w_v, Vector3[] vectors, Color color)
+{
+    Gizmos.color = color;
+    int numVectors = vectors == null ? 0 : vectors.Length;
+    for(int i = 0; i &lt; numVectors; ++i)
+    {
+        Vector3 vector = vectors[i];
+        Vector3 vertex = vertices[i];
+        vertex = l2w.MultiplyPoint(vertex);
+        vector = l2w_v.MultiplyVector(vector);
+        vector.Normalize();
+        Gizmos.DrawLine(vertex, vertex + vector * sizeTBN);
+    }
+}
+</code></pre>
+
+<p>值得注意的是 <code>l2w_v</code>，为了在模型非统一缩放时也能正确显示，所以要这样使用，具体原因<a href="NormalTransformation.html">看这里</a>。显示切线和付切线也是调用的 <code>DrawVectors</code> 函数，只是在调用前需要做点预处理。</p>
+
+<pre><code>// 显示切线
+Vector4[] tangents = mesh.tangents;
+int numTangents = tangents == null ? 0 : tangents.Length;
+if(numTangents &gt; 0)
+{
+    Vector3[] newTangents = new Vector3[numTangents];
+    for(int i = 0; i &lt; numTangents; ++i)
+    {
+        Vector4 tangent = tangents[i];
+        newTangents[i].x = tangent.x;
+        newTangents[i].y = tangent.y;
+        newTangents[i].z = tangent.z;
+    }
+    DrawVectors(vertices, ref l2w, ref l2w, newTangents, Color.red);
+}
+
+// 显示付切线
+Vector3[] normals = mesh.normals;
+Vector4[] tangents = mesh.tangents;
+int numTangents = tangents == null ? 0 : tangents.Length;
+if(numTangents &gt; 0)
+{
+    Vector3[] binTangents = new Vector3[numTangents];
+    for(int i = 0; i &lt; numTangents; ++i)
+    {
+        // 付切线是通过法线和切线计算得来的
+        binTangents[i] = Vector3.Cross(normals[i], new Vector3(tangents[i].x, tangents[i].y, tangents[i].z)) * tangents[i].w;
+    }
+    DrawVectors(vertices, ref l2w, ref l2w, binTangents, Color.green);
+}
+</code></pre>
+
+<p>请注意上面代码调用 <code>DrawVectors</code> 传递的参数，原本应该传 <code>l2w_v</code> 的地方却传了 <code>l2w</code>，这是因为切线和付切线不会受非统一缩放的影响。</p>
+      </section>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      
+    </div>
+  </body>
+</html>
