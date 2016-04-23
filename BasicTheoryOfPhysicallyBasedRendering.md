@@ -32,7 +32,7 @@
 
 这点非常容易在着色系统是实现：在漫反射着色之前，简单的减去被反射的光线。这就意味着高反射率的物体看上去没有了散射光，因为没有光线进入物体表面，几乎都被反射掉了。反过来也是正确的：一个有着更多散射的材质，就无法有很多的反射。
 
-![img](BasicTheoryOfPhysicallyBasedRendering/pbr_theory_refl_diff.png)
+![img](BasicTheoryOfPhysicallyBasedRendering/pbr_theory_conservation.png)
 
 这种能量守恒是基于物理渲染的重要的部分。这可以让艺术家在符合物理定律的基础上调整散射和折射值。然而一个好的艺术效果并不是必须在代码中强制加上这些限制，只是作为一个参考物理概念（nanny physicist），以确保不会偏离规则太远或者在不同的光照条件下变得不一致。
 
