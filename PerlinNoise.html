@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Perlin Noise 及其应用</h1>
+
+<p><strong>2016-5-2</strong></p>
+
+<p>Perlin Noise 可以用来表现自然界中无法用简单形状来表达的物体的形态，比如火焰、烟雾、表面纹路等。要生成 Perlin Noise 可以使用工具离线生成，也可以使用代码运行时生成。最简单常用的离线生成工具就是 Photoshop 了，新建画布，然后直接选择云彩滤镜即可。而这里要介绍的是使用代码生成 Perlin Noise，使用代码运行时生成有几点好处。首先就是 Perlin Noise 纹理不会占用空间，如果大量使用到了 Perlin Noise Texture，这就不失为一个减少包大小的好方法，比如说地形的高度图是通过 Perlin Noise 生成的，同时又有很多张地图。还有个好处就是，运行时生成的是可以根据需要产生不同的变化的，而工具离线生成的就做不到。</p>
+
+<p>以下提到的生成方法以及代码都是来自于<a href="http://devmag.org.za/2009/04/25/perlin-noise/">http://devmag.org.za/2009/04/25/perlin-noise/</a>，在此基础上加上我加入了自己的理解。</p>
+
+<p>下面就来介绍下使用代码生成 Perlin Noise 的几个步骤：</p>
+
+<h3>生成一张随机杂点的纹理</h3>
+
+<p><img src="PerlinNoise/1.jpg" height="200" width="200" alt="img" /></p>
+
+<p>随机杂点纹理是生成 Perlin Noise 的基础，以后所有要用到的数据都是从这张纹理衍生出来的。</p>
+
+<pre><code>private float[,] GenerateWhiteNoise(int width, int height)
+{
+    // 这里的随机数种子很重要
+    // 如果想要每次生成的 Perlin Noise 都一样，只要设置一个相同的值即可
+    // 这里使用随机种子，所有每次都会生成不同的 Perlin Noise
+    Random.seed = Random.Range(int.MinValue, int.MaxValue);
+    float[,] noise = new float[width, height];
+
+    for (int i = 0; i &lt; width; i++)
+    {
+        for (int j = 0; j &lt; height; j++)
+        {
+            noise[i, j] = Random.value;
+        }
+    }
+
+    return noise;
+}
+</code></pre>
+
+<h3>使用不同的采样率对随机杂点纹理进行采样</h3>
+
+<p><img src="PerlinNoise/2.jpg" height="300" width="450" alt="img" /></p>
+
+<p>上图中每一小块是使用不同的采样率对随机杂点纹理进行采样的结果。采样率越小，获得的细节越少，采样率越大，获得的细节越多。左上角的采样率是最小的，所以细节越少。右下角的采样率最大，所以细节越多。我们将使用这几张图来合成最终的 Perlin Noise。在合成过程中，每一张图的合成比重是不一样的，细节越少的占用更多的合成比重，细节越多的占用更少的合成比重。以上图来举例，也就是说，左上角的那张采样纹理决定了 Perlin Noise 最终的大致形状，以后的所有纹理逐一叠加来提供细节，但是比重越来越小。</p>
+
+<pre><code>// 生成指定采样级别的 Noise
+private float[,] GenerateSmoothNoise(float[,] whiteNoise, int octave, int width, int height)
+{   
+    float[,] smoothNoise = new float[width, height];
+
+    // 采样步长
+    int samplePeriod = (int)Mathf.Pow(2, octave);
+    // 采样频率
+    float sampleFrequency = 1.0f / samplePeriod;
+
+    for (int i = 0; i &lt; width; i++)
+    {
+        // 最左点位置
+        int sampler_l = (i / samplePeriod) * samplePeriod;
+        // 最右点位置
+        int sampler_r = (sampler_l + samplePeriod) % width;
+        // 根据实际点与最左最右的距离，计算水平混合系数
+        float horizontal_blend = (i - sampler_l) * sampleFrequency;
+
+        for (int j = 0; j &lt; height; j++)
+        {
+            // 最上点位置
+            int sampler_t = (j / samplePeriod) * samplePeriod;
+            // 最下点位置
+            int sampler_d = (sampler_t + samplePeriod) % height;
+            // 根据实际点与最上最下的距离，计算垂直混合系数
+            float vertical_blend = (j - sampler_t) * sampleFrequency;
+
+            // 左上和右上根据水平混合系数进行插值
+            float top = Interpolate(whiteNoise[sampler_l, sampler_t], whiteNoise[sampler_r, sampler_t], horizontal_blend);
+            // 左下和右下根据水平混合系数进行插值
+            float bottom = Interpolate(whiteNoise[sampler_l, sampler_d], whiteNoise[sampler_r, sampler_d], horizontal_blend);
+            // 最总数值为 top down 根据垂直混合系数进行插值
+            smoothNoise[i, j] = Interpolate(top, bottom, vertical_blend);                    
+        }
+    }
+
+    return smoothNoise;
+}
+
+// 在两个数值间进行插值
+private float Interpolate(float x0, float x1, float alpha)
+{
+    return x0 * (1 - alpha) + alpha * x1;
+}
+</code></pre>
+
+<h3>合成最终的 Perlin Noise</h3>
+
+<p><img src="PerlinNoise/5.jpg" height="200" width="200" alt="img" /></p>
+
+<p>使用面生成的所有采样纹理来合成最终的 Perlin Noise。</p>
+
+<pre><code>public float[,] GeneratePerlinNoise(float[,] whiteNoise, int octaveCount, int width, int height)
+{   
+    // 不同采样级别的 Noise
+    List&lt;float[,]&gt; smoothNoise = new List&lt;float[,]&gt;();
+
+    // 不同采样级别的 Noise 的叠加系数
+    float persistance = 0.8f;
+
+    // 生成不同采样级别的 Noise
+    for (int i = 0; i &lt; octaveCount; i++)
+    {
+        smoothNoise.Add(GenerateSmoothNoise(whiteNoise, i, width, height));
+    }
+
+    // 最终生成的 Perlin Noise
+    float[,] perlinNoise = new float[width, height];
+
+    // 不同采样级别的 Noise 的叠加比重
+    float amplitude = 1.0f;
+    // 所有采样级别的 Noise 的叠加总比重
+    float totalAmplitude = 0.0f;
+
+    // 开始混合所有采样级别的 Noise
+    for (int octave = octaveCount - 1; octave &gt;= 0; octave--)
+    {
+        amplitude *= persistance;
+        totalAmplitude += amplitude;
+
+        for (int i = 0; i &lt; width; i++)
+        {
+            for (int j = 0; j &lt; height; j++)
+            {
+                perlinNoise[i,j] += smoothNoise[octave][i,j] * amplitude;
+            }
+        }
+    }
+
+    // 归一化最终的 Perlin Noise
+    for (int i = 0; i &lt; width; i++)
+    {
+        for (int j = 0; j &lt; height; j++)
+        {
+            perlinNoise[i,j] /= totalAmplitude;
+        }
+    }        
+
+    return perlinNoise;
+}
+</code></pre>
+
+<p>这里有一点是需要注意的，我们很多时候想要生成的 Perlin Noise 需要是一张循环纹理（可以平铺在表面上，在衔接处不会产生不自然的效果）。原始资料中指出，关键点就在 <code>Mathf.Pow(2, octave)</code> 这里，以及提供的 <code>width</code> 和 <code>height</code> 需要是2的幂次方。其实也可以是 <code>Mathf.Pow(3, octave)</code>，<code>width</code> 和 <code>height</code> 是3的幂次方（一般都使用2的幂次方）。其原因就在生成采样纹理时，进行插值的部分。如果每一行（列）的最后一步插值可以正好是下一个 Tile 的第一个点，那么就会生成一个循环的 Perlin Noise。</p>
+
+<h3>应用：残蚀效果</h3>
+
+<table>
+<thead>
+<tr>
+<th>_ </th>
+<th> _</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="PerlinNoise/3.jpg" height="200" width="200" alt="img" /> </td>
+<td> <img src="PerlinNoise/3.gif" height="200" width="200" alt="img" /></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>不同的 Perlin Noise 会产生不同的残蚀效果，我们可以多生成几张 Perlin Noise 纹理，经过对比来达到想要的效果。也可以把几张 Perlin Noise 纹理进行叠加，产生更丰富的效果。一般来说，直接将 Perlin Noise 纹理叠加到 Diffuse 纹理上是不会产生这么锐利的边缘过度的，所以需要对 Perlin Noise 渐变过度进行放大处理，这个放大操作可以预处理在 Texture 上，也可以在 Shader 中。</p>
+
+<h3>应用：动态体积雾</h3>
+
+<table>
+<thead>
+<tr>
+<th>原始FogVolume </th>
+<th> Perlin Noise FogVolume </th>
+<th> Perlin Noise FogVolume GIF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="VolumeFog/2.jpg" height="200" width="200" alt="img" /> </td>
+<td> <img src="PerlinNoise/4.jpg" height="200" width="200" alt="img" /> </td>
+<td> <img src="PerlinNoise/4.gif" height="200" width="200" alt="img" /></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>体积雾的实现原理可以看<a href="VolumeFog.html">这里</a>，效果就是左图。可以看到雾并没有层次，也无法表现出在空中飘动的效果。使用 Perlin Noise 叠加后，雾就有了层次感（中间图），对 Perlin Noise Texture 进行 uv 动画后，雾也产生了飘动的效果（右图），并且由于我们的 Perlin Noise 是可平铺的，所以 uv 动画在边缘不会产生突变。</p>
+      </section>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      
+    </div>
+  </body>
+</html>
