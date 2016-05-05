@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>解析 XML 数据</h1>
+
+<p><strong>2016-5-5</strong></p>
+
+<p>在几个月前我有做过<a href="XmlToCodeToDo.html">这样的记录</a>，其目的是避免解析 XML 时手工编写太多的代码，造成重复的体力劳动。后来经过一番资料的查找，我发现其实并没有必要做这样的工具，因为 C# 已经为我们提供了更好的解决方案了，就是使用 <code>Attribute</code> 和 <code>XmlSerializer</code>。比如说有下面这样的 XML。</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="us-ascii"?&gt;
+&lt;cats&gt;
+    &lt;item animType="Loop" color="White"&gt;
+      &lt;saying&gt;I am a white cat&lt;/saying&gt;
+    &lt;/item&gt;
+    &lt;item animType="Wrap" color="Black"&gt;
+      &lt;saying&gt;I am a black cat&lt;/saying&gt;
+    &lt;/item&gt;
+&lt;/cats&gt;
+</code></pre>
+
+<p>以前在游戏中使用这个 XML 的时候都是手工解析的，伪代码如下。</p>
+
+<pre><code>XmlDocument doc = new XmlDocument();
+doc.Load(xmlStr);
+
+XmlNodeList itemNodes = doc.SelectNodes("cats/item");
+CatCollection cats = new CatCollection();
+foreach(var itemNode in itemNodes)
+{
+    Cat cat = new Cat();
+    // 读取节点数据赋值给 cat
+}
+</code></pre>
+
+<p>每一张 XML 数据表都需要手工写这样的代码，非常耗时，而且还容易出错。但是使用 <code>Attribute</code> 和 <code>XmlSerializer</code>，就不需要自己编写解析 XML 数据的代码了，只需要定义好 XML 数据表对应的 Class 即可。</p>
+
+<pre><code>[XmlRoot("cats")]
+public class CatCollection
+{
+    [XmlElement("item")]
+    public Cat[] Cats { get; set; }
+}
+
+[XmlRoot("cat")]
+public class Cat
+{
+    [XmlAttribute("color")]
+    public string Color { get; set; }
+
+    [XmlElement("saying")]
+    public string Saying { get; set; }
+
+    [XmlAttribute("animType")]
+    public AnimationType animationType;
+}
+</code></pre>
+
+<p>然后像下面这样编写解析 XML 的代码。</p>
+
+<pre><code>XmlSerializer serializer = new XmlSerializer(typeof(CatCollection));
+CatCollection cc = serializer.Deserialize(xmlStr) as CatCollection;
+</code></pre>
+
+<p>如果将上面代码利用泛型封装好，我们所有的 XML 解析代码都可以统一成一个函数，再也不费时费力手动解析了。至于如何生成带有 Attribute 的 Class，应该也有很多办法，似乎 XSD 就可以（我没有测试过），实在不行自己写工具也不是难事。</p>
+
+<p>最后我使用了三种加载 XML 的方式对一张大型的 XML 数据表（977kb），在 IOS 设备上进行了性能测试。测试设备 Iphone6S，从一个空场景启动，并开始解析 XML。</p>
+
+<table>
+<thead>
+<tr>
+<th>解析方式 </th>
+<th> 内存（Mono） </th>
+<th> 耗时（Mono） </th>
+<th> 内存（IL2CPP）</th>
+<th> 耗时（IL2CPP）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XmlDocument </td>
+<td> 45MB  </td>
+<td> 700ms </td>
+<td> 60MB </td>
+<td> 2350ms</td>
+</tr>
+<tr>
+<td>XmlSerializer </td>
+<td> 37MB  </td>
+<td> 550ms </td>
+<td> 41MB </td>
+<td> 1680ms</td>
+</tr>
+<tr>
+<td>TinyBinaryXml </td>
+<td> 33MB  </td>
+<td> 80ms </td>
+<td> 37MB </td>
+<td> 202ms</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>可以看出使用 <code>XmlSerializer</code> 比起我们自己手工解析 XML 数据反而有一定的优势，而且使用起来更方便快捷。奇怪的是 IL2CPP 不管从内存还是耗时上都要差于 Mono。至于 <a href="https://github.com/chengkehan/unityLab/tree/master/TinyBinaryXml">TinyBinaryXml</a> 是什么，它是一个将 XML 文本序列化成字节流的工具，这样只需要处理字节流即可，免去了分析字符串的过程（任何语言处理字符串都是又慢又耗内存的）,一般只是在最后优化时才使用，因为毕竟开发的时候使用文本文件才是最方便的。</p>
+      </section>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      
+    </div>
+  </body>
+</html>
