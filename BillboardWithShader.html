@@ -57,7 +57,7 @@ vert.xyz = 0;
 // 转换到世界坐标
 float4 wPos = mul(_Object2World, vert);
 // 沿着相机坐标系的基轴进行顶点位置的偏移
-wPos.xyz += normalize(UNITY_MATRIX_VP[0].xyz) * bias.r * _SizeW + normalize(UNITY_MATRIX_VP[1].xyz) * bias.g * _SizeH;
+wPos.xyz += normalize(UNITY_MATRIX_V[0].xyz) * bias.r * _SizeW + normalize(UNITY_MATRIX_V[1].xyz) * bias.g * _SizeH;
 
 // 下面就是常规的矩阵变换操作了
 // 由于 wPos 已经在世界坐标了，所以这里就不需要 object2world 的操作
@@ -71,11 +71,25 @@ return o;
 
 <p>图1：这是四个顶点组成的面片（两个三角形）。每个顶点中的颜色值表示的是该顶点沿着相机基轴偏移的方向。R通道1表示沿着相机x基轴正方向偏移，R通道0表示沿着相机x基轴负方向偏移，G通道1表示沿着相机y基轴正方向偏移，G通道0表示沿着相机y基轴负方向偏移。</p></blockquote>
 
-<p>以上实现的 Billboard是完全面向摄像机的，如果想做轴限制的 Billboard 也是很简单的，只需要在 UNITY_MATRIX_VP[0].xyz 以及 UNITY_MATRIX_VP[1].xyz 这两个值上做些处理就可以了。</p>
+<p>以上实现的 Billboard是完全平行于摄像机的，如果想做轴限制的 Billboard 也是很简单的，只需要在 UNITY_MATRIX_V[0].xyz 以及 UNITY_MATRIX_V[1].xyz 这两个值上做些处理就可以了。</p>
+
+<p>如果要实现完全面向摄像机的 Billboard，关键就是要知道三根基轴，只是这时候就不是上面所介绍的三根基轴了，需要自己计算：</p>
+
+<pre><code>// 世界坐标系中的相机位置
+float3 wCamPos = _WorldSpaceCameraPos;
+// 前方向的基轴
+float3 forward = normalize(wCamPos - mul(_Object2World, v.vertex).xyz);
+// 上方向的基轴
+float3 up = normalize(UNITY_MATRIX_V[1].xyz)
+// 右方向的基轴
+float3 right = cross(forward, up);
+</code></pre>
+
+<p>然后使用这三根基轴来对顶点进行偏移即可。</p>
 
 <p>实际在使用的时候，还有一点问题，引擎内部会做一个相机视锥体裁切操作，就是当模型的包围盒（bounds）在相机视锥体外部的时候，会直接不渲染该物体，所以当 Billboard 在屏幕边缘是，会看到 Billboard 会突然消失和出现。而这个 bounds 的尺寸由于是只读，无法直接通过代码修改。这里提供一个方法来解决这个问题，在使用三维软件制作 Billboard 面片的时候，Billboard 的尺寸尽可能的做成实际情况中可能出现的最大的尺寸，这是因为 Shader 中计算顶点偏移时，与顶点本身的位置是完全没有关系的，而和引擎裁切时所使用的包围盒（bounds）是有关系的。这样就可以避免 Billboard 在视口边缘闪现的问题了，有一点小副作用就是 Billboard 的相机视锥体裁切不精确，Billboard 已经完全出了视锥体范围可还是没被才切掉。但是这是不会影响最终的表现效果的，而且这点副作用根本不会影响到渲染性能。</p>
 
-<p>PS：UNITY_MATRIX_VP 这个矩阵，在 Editor 中，引擎会根据在 Game 还是 Scene 窗口，传入两个不同的矩阵，这是正确的，因为在 Scene 窗口中，相机指的是当前的观察者（开发人员），而不是其中的某个 Camera 对象。所以以上代码如果要在 Editor 的 Scene 窗口中产生正确的效果，需要手动传入两个基轴的值，而不是使用 UNITY_MATRIX_VP[0] 和 UNITY_MATRIX_VP[1]。</p>
+<p>PS：UNITY_MATRIX_V 这个矩阵，在 Editor 中，引擎会根据在 Game 还是 Scene 窗口，传入两个不同的矩阵，这是正确的，因为在 Scene 窗口中，相机指的是当前的观察者（开发人员），而不是其中的某个 Camera 对象。所以以上代码如果要在 Editor 的 Scene 窗口中产生正确的效果，需要手动传入两个基轴的值，而不是使用 UNITY_MATRIX_V[0] 和 UNITY_MATRIX_V[1]。</p>
       </section>
 
 <div id="disqus_thread"></div>
