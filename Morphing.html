@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Morphing 动画</h1>
+
+<p><strong>2016-6-20</strong></p>
+
+<p>同一个模型，从一个形状变到另一个形状。如下图所示，从形状1渐变到形状2，再从形状2渐变到形状3，最后从形状3渐变到形状1，以此循环往复。</p>
+
+<table>
+<thead>
+<tr>
+<th>形状1 </th>
+<th> 形状2 </th>
+<th> 形状3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="Morphing/3.jpg" width="250" alt="img" /> </td>
+<td> <img src="Morphing/2.jpg" width="250" alt="img" /> </td>
+<td> <img src="Morphing/4.jpg" width="250" alt="img" /></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>由于这三个形状是由用一个模型衍生而来的（在建模软件中调整顶点位置），所以顶点数量完全相同，并且每个形状的顶点是一一对应的。那么要做到这个效果就很简单了，只需要在顶点之间做插值，将插值结果赋值给 mesh 的 vertex 即可。</p>
+
+<p>关键的问题是，我们是在 CPU 中进行插值计算，后将数据提交到 GPU 中，还是直接在 Shader 中进行插值计算。在 CPU 中计算插值，坏处就是需要有一个动态的 VBO，每一帧都需要向 GPU 提交插值后的数据，当这个数据量很大的时候，消耗也是相当大的。如果可以在 GPU 中进行插值计算，就不会有这个问题，而且由于 GPU 是并行计算的，计算速度也要快很多（这是 CPU 无法比拟的）。那么问题来了，Unity 并没有提供自定义的数据流，做法是将原始顶点数据流和目标顶点数据流传到 Shader 中，在 Shader 中从两个数据流中提取数据，计算插值。所以这里采用一个取巧的办法，顶点数据中的 tangents 我并没有用到，把 tangents 当做一个数据流，将目标顶点数据赋值给 tangents，在 Shader 中对 tangent 和 vertex 进行插值，类似下面的代码。</p>
+
+<pre><code>// 顶点坐标
+float4 vert = v.vertex;
+// v.tangent 中存储了目标顶点坐标值
+// 这里使用线性插值
+vert.xyz = vert.xyz + (v.tangent.xyz - vert.xyz) * _MorphingBlend;
+</code></pre>
+
+<p>这样插值的过程都是在 GPU 中完成了，只需要在插值的最后一帧的时候，修改下动态 VBO 即可，比完全在 CPU 中计算的消耗大大减少了。下图是测试效果。</p>
+
+<p><img src="Morphing/1.gif" alt="img" /></p>
+      </section>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      
+    </div>
+  </body>
+</html>
