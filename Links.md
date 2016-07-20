@@ -6,11 +6,15 @@
 
 [Math is Fun](https://www.mathsisfun.com/)
 
+---
+
 ##SIGGRAPH
 
 [Advances in Real-Time Rendering in 3D Graphics and Games](http://advances.realtimerendering.com/)
 
 [selfshadow](http://blog.selfshadow.com/)
+
+---
 
 ##PBR
 
@@ -28,6 +32,12 @@
 
 [GameDevPapers](https://github.com/Trace0429/GameDevPapers/tree/master/cedec)
 
+[基于物理着色：BRDF](https://zhuanlan.zhihu.com/p/21376124)
+
+[如何看懂这些"该死的"图形学公式](https://zhuanlan.zhihu.com/p/21489591)
+
+---
+
 ##Shadow Mapping
 
 [Cascaded Shadow Maps](https://msdn.microsoft.com/en-us/library/windows/desktop/ee416307%28v=vs.85%29.aspx)
@@ -35,6 +45,8 @@
 [Common Techniques to Improve Shadow Depth Maps](https://msdn.microsoft.com/en-us/library/windows/desktop/ee416324.aspx)
 
 [Soft Shadow Mapping](http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/#drawbacks)
+
+---
 
 ##Dota2
 
@@ -44,17 +56,31 @@
 
 [DOTA 2 ITEM WORKSHOP GUIDELINES HOMEPAGE](http://www.dota2.com/workshop/)
 
+---
+
+#Tricks
+
+[Animating With Math](http://twvideo01.ubm-us.net/o1/vault/gdc2016/Presentations/Burke_Natalie_AnimatingWithMath.pdf)
+
+---
+
 ##OpenGL Learning
 
 [OGL dev Modern OpenGL Tutorials](http://ogldev.atspace.co.uk/index.html)
 
 [Learn OpenGL Your #1 Resource for OpenGL](http://learnopengl.com/)
 
+---
+
 ##Unreal Engine
 [Unreal Engine](http://yun.baidu.com/share/home?uk=2739557438&view=album)
 
+---
+
 ##Unity
 [Unity Blog](http://blogs.unity3d.com/)
+
+---
 
 ##Websites
 
@@ -63,6 +89,8 @@
 [The Art of Diablo](http://gdcvault.com/play/1015306/The-Art-of-Diablo)
 
 [Research and Development Department in tri-Ace Inc.](http://research.tri-ace.com/)
+
+---
 
 ##Blogs
 
