@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+
+<h1>半球积分</h1>
+
+<p><strong>2016-7-23</strong></p>
+
+<h3>半球坐标</h3>
+
+<p>半球坐标是一个二维空间，球面上的每一点都可以由一个方向来确定。一般使用球坐标来表示。</p>
+
+<p>在球坐标中，每一个方向都用两个角度来表示。方位角 $$$ \varphi $$$，仰角 $$$ \theta $$$。这两个角确定了一个方向 $$$ \Theta(\varphi,\theta) $$$。</p>
+
+<blockquote><p><img src="HemisphericalCoordinates/1.jpg" width="400" alt="img" /></p></blockquote>
+
+<p>$$$ \varphi $$$ 和 $$$ \theta $$$ 在一个指定的区间内。</p>
+
+<p>\[\begin{aligned}
+\varphi &amp;\in [0,2\pi] \\
+\theta &amp;\in [0,{\pi \over 2}]
+\end{aligned}\]</p>
+
+<p>球坐标和笛卡尔坐标之间的转换公式：</p>
+
+<p>\[\begin{aligned}
+x &amp;= r cos\varphi sin\theta \\
+y &amp;= r sin\varphi sin\theta \\
+z &amp;= r cos\theta
+\end{aligned}\]</p>
+
+<p>\[\begin{aligned}
+r &amp;= \sqrt{x^2+y^2+z^2} \\
+tan\varphi &amp;= { y \over x } \\
+tan\theta &amp;= { \sqrt{x^2+y^2} \over z }
+\end{aligned}\]</p>
+
+<p>一般在渲染计算中，会并不关心半径 $$$ r $$$，因为是在单位半球中计算的。</p>
+
+<h3>立体角</h3>
+
+<p>半球上的立体角定义为覆盖半球表面区域的面积除以半径的平方：</p>
+
+<p>\[
+\Omega = { A \over r^2 }
+\]</p>
+
+<blockquote><p><img src="HemisphericalCoordinates/2.jpg" width="400" alt="img" /></p></blockquote>
+
+<p>如果是单位半球（$$$ r=1 $$$），立体角 $$$ \Omega $$$ 就等于覆盖在半球上的面积 $$$ A $$$，即 $$$ \Omega = A $$$。由于半球面积是 $$$ 2 \pi r^2 $$$，所以整个半球的立体角 $$$ \Omega $$$ 等于 $$$ 2 \pi $$$。</p>
+
+<p>要计算任意表面的立体角时，先将任意表面投影到半球表面，再计算半球表面区域所对应的立体角。</p>
+
+<p>对于一个<strong>极小的</strong>表面，要计算其立体角可以使用如下的<strong>近似</strong>方法：</p>
+
+<p>\[
+\Omega \approx { A cos\alpha \over d^2 }
+\]</p>
+
+<blockquote><p><img src="HemisphericalCoordinates/3.jpg" width="400" alt="img" /></p></blockquote>
+
+<h3>半球积分</h3>
+
+<blockquote><p><img src="HemisphericalCoordinates/4.jpg" width="400" alt="img" /></p></blockquote>
+
+<p>微分立体角（differential solid angle）的值大小就是单位半球($$$ r=1 $$$)的红色区域的面积，红色区域（$$$ dA $$$）是一个极小的（微分）区域。如上图所示：</p>
+
+<p>\[\begin{aligned}
+dA &amp;= d\theta d\varphi \\
+d\theta &amp;= r \Delta\theta \\
+d\varphi &amp;= r sin\theta \Delta\varphi \\
+dA &amp;= r^2 sin\theta \Delta\theta \Delta\varphi
+\end{aligned}\]</p>
+
+<p>由于是单位半球（$$$ r=1 $$$）,所以：</p>
+
+<p>\[\begin{aligned}
+dA &amp;= sin\theta \Delta\theta \Delta\varphi \\
+\end{aligned}\]</p>
+
+<p>所以半球积分是：</p>
+
+<p>\[\begin{aligned}
+&amp; \int_{\Omega} sin\theta d\theta d\varphi \\
+&amp; \int_{0}^{2\pi} \int_{0}^{\pi \over 2} sin\theta d\theta d\varphi \\
+&amp; d\omega = d\theta d\varphi \\
+&amp; \int_{0}^{2\pi} \int_{0}^{\pi \over 2} sin\theta d\omega
+\end{aligned}\]</p>
+
+<p>注意积分中的 $$$ d\theta $$$ 和 $$$ d\varphi $$$（积分符号） 和上文中表示微分边长的 $$$ d\theta $$$ 和 $$$ d\varphi $$$ 是不一样的意义，虽然符号相同。</p>
+
+      </section>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//jimgamedevwebsite.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      
+    </div>
+  </body>
+</html>
