@@ -58,7 +58,7 @@
 
 ---
 
-#Tricks
+##Tricks
 
 [Animating With Math](http://twvideo01.ubm-us.net/o1/vault/gdc2016/Presentations/Burke_Natalie_AnimatingWithMath.pdf)
 
