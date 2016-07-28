@@ -16,11 +16,11 @@ $$$ L(x \rightarrow \Theta) $$$：入射辐射率（radiance）
 
 $$$ L(x \leftarrow \Theta) $$$：出射辐射率（radiance）
 
-$$$ E(x) $$$：入射福照度（irradiance）
+$$$ E(x) $$$：入射辐照度（irradiance）
 
-$$$ B(x) $$$：出射福照度（radiosity）
+$$$ B(x) $$$：出射辐照度（radiosity）
 
-其它各种辐射测量量，通量（flux）、入射福照度（irradiance）、出射福照度（radiosity），都可以通过辐射率（radiance）推导出来。
+其它各种辐射测量量，通量（flux）、入射辐照度（irradiance）、出射辐照度（radiosity），都可以通过辐射率（radiance）推导出来。
 
 ---
 
@@ -34,7 +34,7 @@ L(x \rightarrow y) = L(y \leftarrow x)
 
 这个公式表示的是，从 $$$ x $$$ 点射出且朝向 $$$ y $$$ 的辐射率，等同于，从到达 $$$ y $$$ 且从 $$$ x $$$方向来的辐射率。
 
-![img](Radiometry/1.jpg =400x)
+> ![img](Radiometry/1.jpg =400x)
 
 根据辐射率的定义：
 
