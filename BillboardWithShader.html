@@ -92,18 +92,7 @@ float3 right = cross(forward, up);
 <p>PS：UNITY_MATRIX_V 这个矩阵，在 Editor 中，引擎会根据在 Game 还是 Scene 窗口，传入两个不同的矩阵，这是正确的，因为在 Scene 窗口中，相机指的是当前的观察者（开发人员），而不是其中的某个 Camera 对象。所以以上代码如果要在 Editor 的 Scene 窗口中产生正确的效果，需要手动传入两个基轴的值，而不是使用 UNITY_MATRIX_V[0] 和 UNITY_MATRIX_V[1]。</p>
       </section>
 
-<div id="disqus_thread"></div>
-<script>
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//jimgamedevwebsite.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+<hr/><br/><br/>
       
     </div>
   </body>

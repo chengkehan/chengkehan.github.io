@@ -72,18 +72,7 @@ depth = tex2Dproj(_CameraDepthTexture, uv);
 
 <p>最后说一下 Depth Buffer 的事情。上文中说到的是我们使用 Unity 提供的接口来获取 Depth Buffer，其实完全可以自己来渲染 Depth Buffer，详见<a href="CustomDepthTexture.html">CustomDepthTexture</a>。这样做是有一定的好处的，比如说有很多小物件我们并不需要渲染到 Depth Buffer 中，因为这种细小的深度值变化根本不会影响到最终的效果，这样在渲染深度纹理时就能节省下一部分资源。</p>
       </section>
-      <div id="disqus_thread"></div>
-<script>
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//jimgamedevwebsite.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+      <hr/><br/><br/>
     </div>
   </body>
 </html>

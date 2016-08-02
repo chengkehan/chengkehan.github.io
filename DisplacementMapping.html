@@ -139,18 +139,7 @@ o.pos = mul(UNITY_MATRIX_VP, o.wpos);
 <p>至此，所有的要点都说明了。最后我又在设备上进行了测试，发现当图形接口是 OpenglES 3.0 的时候显示效果是正确的，但是 Metal 就不正确了。最终发现 Metal 中 ddy 和 OpenglES 3.0 中的 ddy 返回值不同，第一反应是 Metal 在实现上应该不会出问题，因为两个图形接口在 ddx 的返回结果是一致的。我把最后一步求平滑的 fake_normal 的差乘两边交换了一下，变成 <code>float3 fake_normal = cross(fake_tangent_new， fake_bintangent_new)</code>，于是效果就正确了。这说明两个图形接口在处理 ddy 时，虽然都是纵向，但是方向相反。</p>
       </section>
 
-<div id="disqus_thread"></div>
-<script>
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//jimgamedevwebsite.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+<hr/><br/><br/>
       
     </div>
   </body>

@@ -134,18 +134,7 @@ CatCollection cc = serializer.Deserialize(xmlStr) as CatCollection;
 <p>可以看出使用 <code>XmlSerializer</code> 比起我们自己手工解析 XML 数据反而有一定的优势，而且使用起来更方便快捷。奇怪的是 IL2CPP 不管从内存还是耗时上都要差于 Mono。至于 <a href="https://github.com/chengkehan/unityLab/tree/master/TinyBinaryXml">TinyBinaryXml</a> 是什么，它是一个将 XML 文本序列化成字节流的工具，这样只需要处理字节流即可，免去了分析字符串的过程（任何语言处理字符串都是又慢又耗内存的）,一般只是在最后优化时才使用，因为毕竟开发的时候使用文本文件才是最方便的。</p>
       </section>
 
-<div id="disqus_thread"></div>
-<script>
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//jimgamedevwebsite.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+<hr/><br/><br/>
       
     </div>
   </body>
