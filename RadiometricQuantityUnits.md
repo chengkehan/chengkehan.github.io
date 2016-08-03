@@ -1,6 +1,6 @@
 # Radiometric Quantity Units 辐射量单位
 
-**2016-7-?**
+**2016-8-3**
 
 光子的波长 $$$ \lambda $$$、频率 $$$ \nu $$$（Hertz）、能量 $$$ Q $$$（Joules）之间的关系。
 

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Radiometric Quantity Units 辐射量单位</h1>
+
+<p><strong>2016-8-3</strong></p>
+
+<p>光子的波长 $$$ \lambda $$$、频率 $$$ \nu $$$（Hertz）、能量 $$$ Q $$$（Joules）之间的关系。</p>
+
+<p>\[\begin{aligned}
+\nu &amp;= { c \over \lambda } \\
+\lambda &amp;= { c \over \nu } \\
+Q &amp;= { h \nu }
+\end{aligned}\]</p>
+
+<p>其中 $$$ c $$$ 是光速（$$$ 2.998 \times 10^8 \ meters/second $$$）,$$$ h $$$ 是 Planck 常数（$$$ 6.62620 \times 10^{-34} \ joule \cdot seconds $$$）</p>
+
+<p>电磁辐射存在于一定范围的频率和能量内，从低频的无线电波到高频的 $$$ \gamma $$$ 射线。波长大约在 380 至 780 纳米之间的光子为人眼可感知的（可见光谱）。</p>
+
+<blockquote><p><img src="RadiometricQuantityUnits/1.png" width="1000" alt="img" /></p></blockquote>
+
+<h3>Radiant Energy 辐射能量</h3>
+
+<p>在辐射度学（Radiometry）中，基础的单位是辐射能量 $$$ Q $$$，单位是 $$$ joules $$$。每个光子都有一定量的辐射能量，正比于频率。</p>
+
+<h3>Radiant Flux 辐射通量</h3>
+
+<p>辐射通量表示每秒发射的能量（$$$ dQ/dt $$$），单位是 $$$ joules/second $$$，或者是 $$$ watt $$$，符号为 $$$ \Phi $$$。</p>
+
+<h3>Irradiance 辐照度</h3>
+
+<p>辐照度表示单位面积上的光通量，单位是 $$$ watts/m^2 $$$。入射辐照度用 $$$ E $$$ 表示，出射辐照度（radiosity、radiant exitance）用 $$$ M $$$ 或者 $$$ B $$$ 表示。</p>
+
+<p>\[
+E = M = B = { d\Phi \over dA }
+\]</p>
+
+<h3>Radiance 辐射率</h3>
+
+<p>辐射率是单位面积单位立体角的光通量，单位是 $$$ watts / (m^2 \cdot steradian) $$$，用 $$$ L $$$ 表示。</p>
+
+<p>\[
+L = { d^2\Phi \over d\omega dA_{\perp} } = { d^2\Phi \over d\omega dAcos\theta }
+\]</p>
+
+<blockquote><p><img src="RadiometricQuantityUnits/2.jpg" width="1000" alt="img" /></p></blockquote>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
