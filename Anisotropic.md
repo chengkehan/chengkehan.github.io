@@ -41,7 +41,7 @@ sin\theta^{specularity} &= \sqrt{1-cos\theta^2}^{specularity}
 
 从公式中可以看出当 $$$ \theta $$$ 为 $$$ {\pi \over 2} $$$ 时值达到最大，并使用类似 BlinnPhong 也有的 pow 操作来提亮高光。
 
-Lambert | BlinnPhong
+$$$ sin\theta $$$ | $$$ pow(sin\theta, specularity) $$$
 ------------ | ------------- 
 ![img](Anisotropic/5.png =300x) | ![img](Anisotropic/6.png =300x)
 
