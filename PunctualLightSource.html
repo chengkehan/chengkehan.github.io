@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>精确光源 Punctual Light Source</h1>
+
+<p><strong>2016-8-21</strong></p>
+
+<p>根据 BRDF 的定义：</p>
+
+<p>\[\begin{align}
+f(l,v) &amp;= { dL_{o} \over dE_{i} } \\
+f(l,v) &amp;= { dL_{o} \over L_{i} cos\theta_{i} d\omega_{i} } \\
+dL_{o} &amp;= f(l,v) L_{i} cos\theta_{i} d\omega_{i} \\
+L_{o} &amp;= \int_{\Omega} f(l,v) L_{i} cos\theta_{i} d\omega_{i} \tag{eq1}
+\end{align}\]</p>
+
+<p>$$$ L_{o} $$$ 就是出射辐射率(radiance)，也就是最终视觉感知到的量（渲染表现到像素颜色上的最终结果）。基本的 BRDF 都是基于精确光源（Punctual Light Sources）这个假设前提下的，所谓的精确光源是一个大小为无穷小且方向确定的光源。我们经常使用的方向光源（Directional Light）、点光源（Point Light）、聚光灯光源（Spotlight）是精确光源。有一点是需要注意的，当传播介质为真空时，辐射率（radiance）$$$ L_{o} $$$ 是不会随着距离衰减的，在现实中表现为一个红色的物体不管距离你有多远，你看到的这个物体都是红色（忽略大气散射等因素）。而真正衰减的应该是辐照度（Irradiance），单位面积上的光通量：</p>
+
+<p>\[
+E = { \Phi \over A }
+\]</p>
+
+<p>设想一个点光源，随着光子一层层的向外扩散，$$$ A $$$ 也就越来越大，这就导致了辐照度（Irradiance）逐渐减小。如果把点光源想象成太阳，离太阳越远辐照度（Irradiance）越小就意味着，距离太阳越远能感受到的热能越小。但是因为辐射率（radiance）不会随着距离减小，所以并不会因为距离太阳的远近，而看到两种不同颜色的太阳（绝对真空的环境下）。</p>
+
+<p>使用精确光源这个概念是为了将出射辐射率（radiance）的计算进行简化。从上面给出的计算 $$$ L_{o} $$$ 的方程可以看到，有一个积分的计算，有了精确光源这个假设，就可以消除原本的积分计算部分。</p>
+
+<p>我们使用 $$$ c_{light} $$$ 表示光源的颜色，$$$ l_{c} $$$ 表示光源的方向。$$$ c_{light} $$$ 被定义为白色的 Lambertian 表面被平行于表面法线（$$$ l_{c}=n $$$）的光照亮时的颜色。上文说了，精确光源的大小是无穷小的，无穷小也是有大小的，使用 $$$ \varepsilon $$$ 表示，意思是以 $$$ l_{c} $$$ 为中心，精确光源为大小所形成的一个张角。根据 $$$ c_{light} $$$ 的定义得到：</p>
+
+<p>\[
+c_{light} = { c_{diff} \over \pi } \int_{\Omega} L_{i} cos\theta_{i} d\omega_{i}
+\]</p>
+
+<p>积分外的 $$$ { c_{diff} \over \pi } $$$ 是 Lambert 常量，由于是白色，所以 $$$ c_{diff} $$$ 是 1。积分内的是反射方程，又由于 $$$ l_{c}=n $$$，所以 $$$ cos\theta_{i} = 1 $$$，所以：</p>
+
+<p>\[\begin{align}
+c_{light} &amp;= { 1 \over \pi } \int_{\Omega} L_{i} d\omega_{i} \\
+\pi c_{light} &amp;= \int_{\Omega} L_{i} d\omega_{i} \tag{eq2}
+\end{align}\]</p>
+
+<p>将 $$$ ep2 $$$ 代入 $$$ eq1 $$$：</p>
+
+<p>\[\begin{align}
+L_{o} &amp;= \int_{\Omega} f(l,v) L_{i} cos\theta_{i} d\omega_{i} \\
+L_{o} &amp;= f(l,v) cos\theta_{i} \int_{\Omega} L_{i} d\omega_{i} \\
+L_{o} &amp;= f(l,v) cos\theta_{i} \pi c_{light}
+\end{align}\]</p>
+
+<p>更详细的介绍，可以查看 <a href="http://blog.selfshadow.com/publications/s2013-shading-course/hoffman/s2013_pbs_physics_math_notes.pdf">Background: Physics and Math of Shading 的 Punctual Light Source 章节</a>。如果同时受到多个精确光源照射，只需要对每个光源重复执行上式，并将结果求和即可。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
