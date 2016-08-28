@@ -32,7 +32,7 @@
 >
 > $$$ P\_{N} $$$ : 平面的法向量
 
-对于一个平面来说，$$$ P\_{x}-P\_{o} $$$ 最形成的向量与 $$$ P\_{N} $$$ 向量永远垂直，所以点积总是 $$$ 0 $$$。
+对于一个平面来说，$$$ P\_{x}-P\_{o} $$$ 形成的向量与 $$$ P\_{N} $$$ 向量永远垂直，所以点积总是 $$$ 0 $$$。
 
 使用以下方程表示射线：
 
@@ -53,6 +53,55 @@ R(t) = R\_{o} + R\_{D} * t
 { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} } &= t
 \end{align}\\]
 
-得到 $$$ t $$$ 之后，就可以将 $$$ t $$$ 代回射线方程，求出交点了。注意这个交点是在世界坐标下的，我们需要将其转换到要投影面片的模型坐标下，并转换成 uv 坐标，从要投影面片的纹理中采样。这就是完整的思路。
+得到 $$$ t $$$ 之后，就可以将 $$$ t $$$ 代回射线方程，求出交点了。注意这个交点是在世界坐标下的，我们需要将其转换到要投影面片的模型坐标下，并转换成 uv 坐标，从要投影面片的纹理中采样。注意上式的分母，如果等于 0 就表示平面和射线没有交点。
 
 关键部分的代码其实就是将以上的公式翻译成代码即可。这里提供一个小技巧，在实现着色器代码的时候总是会出现各种意想不到的问题，这时候就很难调试了，我是先在脚本中将所有的计算都实现了一边，并使用 Gizmos 将过程以及结果以辅助线的形式绘制出来，确保无误后再移植到 Shader 中的。这样的好处就是方便调试，有什么问题立刻能看出来。
+
+脚本代码：
+
+	// Application code
+	material.SetVector("_PlanePos", plane.position);
+	material.SetVector("_PlaneN", plane.forward);
+	material.SetMatrix("_PlaneW2O", plane.worldToLocalMatrix);
+
+着色器代码：
+
+	// Shader code
+	// fragment
+	float3 viewDir = normalize(IN.worldPos - _WorldSpaceCameraPos);
+	float3 worldNormal = normalize(IN.worldNormal);
+	float3 reflectDir = normalize(reflect(viewDir, worldNormal));
+	
+	float3 Po_Ro = _PlanePos - IN.worldPos;
+	float dot_RD_PN = dot(reflectDir, _PlaneN);
+	float t = dot(Po_Ro, _PlaneN) / dot_RD_PN;
+	// 以上计算其实就是将上文中的公式翻译成 Shader
+	// 这里得到的 intersectionPos 就是射线和平面的交点
+	float3 intersectionPos = IN.worldPos + reflectDir * t;
+	// 由于这个交点是在世界空间坐标下的，所以将其转换到平面的模型坐标系下
+	intersectionPos = mul(_PlaneW2O, float4(intersectionPos,1));
+	// 将模型坐标系下的坐标映射为 uv 坐标
+	// 由于我使用的是一个单位长度为 1 的 Plane
+	// 所以是将模型坐标系下的 -0.5~0.5 映射为 0~1
+	intersectionPos += 0.5;
+	float2 uv = intersPos.xy;
+	fixed4 reflCol = 0;
+	// 超出 0~1 纹理坐标范围外的区域要忽略掉
+	if (intersPos.x < 0 || intersPos.x > 1 || intersPos.y < 0 || intersPos.y > 1)
+	{
+		reflCol = 0;
+	}
+	else
+	{
+		reflCol = tex2D(_ReflTex, float2(1-uv.x, uv.y));
+	}
+	// 混合到固有色中
+	o.Albedo = o.Albedo * (1 - reflcol.a) + reflcol.rgb * reflcol.a;
+	
+上面的着色器代码中，if 是一个消耗较大的操作，有一个办法可以将其去除，就是在 _ReflTex 纹理边缘留白，并将纹理的 WrapMode 设置为 Clamp，这是 _ReflTex 的 Alpha 通道看起来像是这样：
+
+> ![img](BillboardReflection/4.jpg =400x)
+>
+> 注意白色非透明区域并没有撑满区域，而是在四周围留出了空间。
+
+以上就是实现 Billboard Reflection 所需要的基本知识了。
