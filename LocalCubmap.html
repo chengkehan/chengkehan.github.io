@@ -106,6 +106,10 @@ half3 intersectPosition = IN.worldPos + reflectDir * intersectDistance;
 fixed4 reflcol = texCUBElod(_CubeMap, float4(intersectPosition - _BoxPosition, _Roughness));
 </code></pre>
 
+<blockquote><p><img src="LocalCubmap/9.gif" width="300" alt="img" /></p>
+
+<p>Figure 1 中错误的效果得到了修正</p></blockquote>
+
 <p>上文说了，这种计算能够成立的前提是 AABB，但是如果是非 AABB 该怎么办呢，其实很简单就是将值转换到 AABB 中再进行计算。下面就直接给出着色器代码了。</p>
 
 <pre><code>float3 wpos = float3(_Object2World[0].w, _Object2World[1].w, _Object2World[2].w);
@@ -145,7 +149,7 @@ fixed4 reflcol = texCUBElod(_CubeMap, float4(float3(ReflDirectionWS.x,ReflDirect
 </table>
 
 
-<p>左图中窗户内部的物体是实实在在的模型，而右图中窗户内部的看似是有物体的，但其实是通过上文介绍的方法进行的模拟，效果非常好，减少了大量房屋内部的模型消耗。同时从窗内向窗外看也能看到天空。</p>
+<p>左图中窗户内部的物体是实实在在的模型，而右图中窗户内部的看似是有物体的，但其实是通过上文介绍的方法进行的模拟，效果非常好，减少了大量房屋内部的模型消耗。同时窗外的景色也因为 Cubmap 而没有丢失。</p>
 
 <blockquote><p><img src="LocalCubmap/8.jpg" width="400" alt="img" /></p></blockquote>
 

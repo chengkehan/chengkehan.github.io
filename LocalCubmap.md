@@ -52,6 +52,10 @@ t = { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} }
 	half3 intersectPosition = IN.worldPos + reflectDir * intersectDistance;
 	// 使用新的反射向量采样 Cubmap
 	fixed4 reflcol = texCUBElod(_CubeMap, float4(intersectPosition - _BoxPosition, _Roughness));
+
+> ![img](LocalCubmap/9.gif =300x)
+>
+> Figure 1 中错误的效果得到了修正
 	
 上文说了，这种计算能够成立的前提是 AABB，但是如果是非 AABB 该怎么办呢，其实很简单就是将值转换到 AABB 中再进行计算。下面就直接给出着色器代码了。
 
@@ -79,7 +83,7 @@ Figure 4 | Figure 5
 ------------ | ------------- 
 ![img](LocalCubmap/6.gif =300x) | ![img](LocalCubmap/7.gif =300x) 
 
-左图中窗户内部的物体是实实在在的模型，而右图中窗户内部的看似是有物体的，但其实是通过上文介绍的方法进行的模拟，效果非常好，减少了大量房屋内部的模型消耗。同时从窗内向窗外看也能看到天空。
+左图中窗户内部的物体是实实在在的模型，而右图中窗户内部的看似是有物体的，但其实是通过上文介绍的方法进行的模拟，效果非常好，减少了大量房屋内部的模型消耗。同时窗外的景色也因为 Cubmap 而没有丢失。
 
 > ![img](LocalCubmap/8.jpg =400x)
 
