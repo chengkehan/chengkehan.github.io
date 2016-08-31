@@ -45,9 +45,9 @@
 <table>
 <thead>
 <tr>
-<th>Figure 1 </th>
-<th> Figure 2 </th>
-<th> Figure 3</th>
+<th><em>Demo1</em> </th>
+<th> <em>天下手游截图1</em> </th>
+<th> <em>天下手游截图2</em></th>
 </tr>
 </thead>
 <tbody>
@@ -60,7 +60,7 @@
 </table>
 
 
-<p>Figure 1 中，可以看到大理石地面的反射错了。Figure 2 中，柱子的反射错位了。Figure 3 中，王座的反射明显和模型产生了错位，不是正常的角度。这是普通计算 Cubmap 的反射射线方式所无法避免的</p>
+<p><em>Demo1</em> 中，可以看到大理石地面的反射错了。 <em>天下手游截图1</em> 中，柱子的反射错位了。 <em>天下手游截图2</em> 中，王座的反射明显和模型产生了错位，不是正常的角度。这是普通计算 Cubmap 的反射射线方式所无法避免的</p>
 
 <pre><code>// 通过视线向量和法线向量计算反射向量
 float3 reflDir = reflect(viewDir, normal);
@@ -106,16 +106,31 @@ half3 intersectPosition = IN.worldPos + reflectDir * intersectDistance;
 fixed4 reflcol = texCUBElod(_CubeMap, float4(intersectPosition - _BoxPosition, _Roughness));
 </code></pre>
 
-<blockquote><p><img src="LocalCubmap/9.gif" width="300" alt="img" /></p>
+<blockquote><table>
+<thead>
+<tr>
+<th><em>Demo2</em> </th>
+<th> <em>Demo3</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="LocalCubmap/9.gif" width="300" alt="img" /> </td>
+<td> <img src="LocalCubmap/10.jpg" width="300" alt="img" /></td>
+</tr>
+</tbody>
+</table>
 
-<p>Figure 1 中错误的效果得到了修正</p></blockquote>
+
+<p><em>Demo2</em> 修正了 <em>Demo1</em> 中的错误</p>
+
+<p><em>Demo3</em> 添加了扰动法线，并结合纹理的 Mipmap 做出了 Roughness 效果</p></blockquote>
 
 <p>上文说了，这种计算能够成立的前提是 AABB，但是如果是非 AABB 该怎么办呢，其实很简单就是将值转换到 AABB 中再进行计算。下面就直接给出着色器代码了。</p>
 
 <pre><code>float3 wpos = float3(_Object2World[0].w, _Object2World[1].w, _Object2World[2].w);
 float3 viewDir = IN.worldPos - wpos - (_WorldSpaceCameraPos - wpos);
 float3 worldNorm = IN.worldNormal;
-worldNorm.xy -= n;
 float3 reflectDir = reflect (viewDir, worldNorm);
 reflectDir = normalize(reflectDir);
 
@@ -136,8 +151,8 @@ fixed4 reflcol = texCUBElod(_CubeMap, float4(float3(ReflDirectionWS.x,ReflDirect
 <table>
 <thead>
 <tr>
-<th>Figure 4 </th>
-<th> Figure 5</th>
+<th><em>Demo4</em> </th>
+<th> <em>Demo5</em></th>
 </tr>
 </thead>
 <tbody>

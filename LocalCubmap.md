@@ -4,12 +4,12 @@
 
 使用 Cubmap 可以模拟出环境的反射，预先将环境渲染到 Cubmap 中，从而避免在游戏运行时对环境的实时反射产生的消耗，而且这样做表现效果也非常好。在一些户外环境尤其适用，比如说车身反射外部的环境。但是在一些室内的环境中，普通的 Cubmap 反射通常会产生奇怪的效果。
 
-Figure 1 | Figure 2 | Figure 3
+_Demo1_ | _天下手游截图1_ | _天下手游截图2_
 ------------ | ------------- | ------------
 ![img](LocalCubmap/1.jpg =250x) | ![img](LocalCubmap/3.jpg =250x)  | ![img](LocalCubmap/4.jpg =250x)
 
 
-Figure 1 中，可以看到大理石地面的反射错了。Figure 2 中，柱子的反射错位了。Figure 3 中，王座的反射明显和模型产生了错位，不是正常的角度。这是普通计算 Cubmap 的反射射线方式所无法避免的
+_Demo1_ 中，可以看到大理石地面的反射错了。 _天下手游截图1_ 中，柱子的反射错位了。 _天下手游截图2_ 中，王座的反射明显和模型产生了错位，不是正常的角度。这是普通计算 Cubmap 的反射射线方式所无法避免的
 
 	// 通过视线向量和法线向量计算反射向量
 	float3 reflDir = reflect(viewDir, normal);
@@ -53,16 +53,19 @@ t = { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} }
 	// 使用新的反射向量采样 Cubmap
 	fixed4 reflcol = texCUBElod(_CubeMap, float4(intersectPosition - _BoxPosition, _Roughness));
 
-> ![img](LocalCubmap/9.gif =300x)
+> _Demo2_ | _Demo3_ 
+> ------------ | ------------- 
+> ![img](LocalCubmap/9.gif =300x) | ![img](LocalCubmap/10.jpg =300x) 
 >
-> Figure 1 中错误的效果得到了修正
+> _Demo2_ 修正了 _Demo1_ 中的错误
+>
+> _Demo3_ 添加了扰动法线，并结合纹理的 Mipmap 做出了 Roughness 效果
 	
 上文说了，这种计算能够成立的前提是 AABB，但是如果是非 AABB 该怎么办呢，其实很简单就是将值转换到 AABB 中再进行计算。下面就直接给出着色器代码了。
 
 	float3 wpos = float3(_Object2World[0].w, _Object2World[1].w, _Object2World[2].w);
 	float3 viewDir = IN.worldPos - wpos - (_WorldSpaceCameraPos - wpos);
 	float3 worldNorm = IN.worldNormal;
-	worldNorm.xy -= n;
 	float3 reflectDir = reflect (viewDir, worldNorm);
 	reflectDir = normalize(reflectDir);
 
@@ -79,7 +82,7 @@ t = { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} }
 	
 使用这种方法我们还可以实现很多有趣的效果，比如像下面这样的：
 
-Figure 4 | Figure 5 
+_Demo4_ | _Demo5_
 ------------ | ------------- 
 ![img](LocalCubmap/6.gif =300x) | ![img](LocalCubmap/7.gif =300x) 
 
