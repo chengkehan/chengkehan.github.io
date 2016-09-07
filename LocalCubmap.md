@@ -1,3 +1,7 @@
+# 视差 Cubmap
+
+**2016-9-7**
+
 注：本文所介绍的技术来自于 [https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/](https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/) 这篇文章中的 Parallax correction for local cubemaps 章节。
 
 ---
@@ -16,9 +20,11 @@ _Demo1_ 中，可以看到大理石地面的反射错了。 _天下手游截图1
 	// 使用反射向量采样 Cubmap
 	fixed4 col = texCUBE(_EnvMap, reflDir);
 	
-当以相同的视角看地面时，得到的反射向量是不会发生变化的，所以地面上反射的 Cubmap 不会随着观察角度的不同而发生改变。一般我们认为 Cubmap 是一个无穷大的立方体包围着要产生反射的物体，上面的效果和这个假设是匹配的。下面我们使用一种新的方法来计算反射向量。
+一般我们认为 Cubmap 是一个无穷大的立方体包围着要产生反射的物体，上面的效果和这个假设是匹配的。下面我们使用一种新的方法来计算反射向量。
 
 > ![img](LocalCubmap/2.jpg =400x)
+>
+> 在 [Parallax Collection for Local Cubmaps](https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/) 中提到点B和点C可以是不重叠的两个点，我在制作中发现如果要得到比较好的效果，B和C两点多为重叠的情况，当然B和C两点也可以使用一个偏移量来达到微调的作用。
 
 图中，R 是使用上文中介绍的方法计算得到的反射向量，R 射线和假想的 Cubmap 范围盒交点于 P，再从产生 Cubmap 快照的点 B 到 P 形成的新的向量即是新的反射向量 NewR。这些步骤中最为关键的就是求出交点 P。
 
@@ -27,6 +33,8 @@ _Demo1_ 中，可以看到大理石地面的反射错了。 _天下手游截图1
 \\[
 t = { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} }
 \\]
+
+在三维空间中一条射线和一个平面可能会没有交点，但是一条射线和六个相互正交的平面是不会没有交点的，所以这里就不考虑射线和平面没有交点的情况了。
 
 先说明下以后的计算所基于的一个前提，就是假想的 Cubmap 范围盒（上图中外层的黑色细线矩形）是一个 AABB。AABB 的全称是 Axis Aligned Bounding Box，从字面上翻译为轴对齐的包围盒，最重要的一点是轴对齐的，也就是说这个包围盒的任何一条边和 XYZ 三根正交轴不是平行就是垂直。我们知道 Cubmap 有六个面，如果这六个面是任意的，那么将会增加很多射线和平面检测的计算量，但是由于有了 AABB，这一部分的计算量被大大减少了。
 
@@ -40,8 +48,8 @@ t = { (P\_{o} - R\_{o}) \cdot P\_{N} \over R\_{D} \cdot P\_{N} }
 	// 得到反射向量
 	reflectDir = normalize(reflectDir);
 
-	// _BoxPosition 表示假象的 Cubmap 范围盒的中心点
-	// _BoxSize 表示假象的 Cubmap 范围盒的尺寸
+	// _BoxPosition 表示假想的 Cubmap 范围盒的中心点
+	// _BoxSize 表示假想的 Cubmap 范围盒的尺寸
 	half3 boxStart = _BoxPosition - _BoxSize * 0.5;
 	half3 firstPlaneIntersect = (boxStart + _BoxSize - IN.worldPos) / reflectDir;
 	half3 secondPlaneIntersect = (boxStart - IN.worldPos) / reflectDir;

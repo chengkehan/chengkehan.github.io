@@ -1,3 +1,7 @@
+# Billboard Reflection
+
+**2016-9-7**
+
 需要实现的效果如下图，在一个光滑的大理石平面上反射出物体的镜像：
 
 > ![img](BillboardReflection/1.jpg =400x)
