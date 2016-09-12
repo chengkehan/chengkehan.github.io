@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>小地图制作</h1>
+
+<p><strong>2016-9-12</strong></p>
+
+<p>我们要实现的小地图是类似下面这样的：</p>
+
+<blockquote><p><img src="Minimap/1.jpg" width="300" alt="img" /></p>
+
+<p>火炬之光截图</p></blockquote>
+
+<p>经过分析，其中主要的功能是如何表现出已探索区域和未探索区域，并且由于小地图不会占据屏幕很大的空间，所以随着玩家的走动小地图会左右上下滚动，当超出范围边框时会逐渐淡出。要实现这样的功能，主要用到的就是遮罩。这里用到两个遮罩，第一个遮罩用来标识区域是否探索，第二个遮罩用来标识小地图可滚动的范围，就像下面这样：</p>
+
+<table>
+<thead>
+<tr>
+<th><em>Mask1</em> </th>
+<th> <em>Mask2</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="Minimap/2.jpg" width="300" alt="img" /> </td>
+<td> <img src="Minimap/3.jpg" width="300" alt="img" /></td>
+</tr>
+</tbody>
+</table>
+
+
+<p><em>Mask1</em> 中白色区域表示已探索，黑色区域表示未探索； <em>Mask2</em> 中白色区域是地图UI可见范围，地图滚动出这个范围就会淡出。编辑器中大致的结构如下图</p>
+
+<blockquote><p><img src="Minimap/4.jpg" width="400" alt="img" /></p></blockquote>
+
+<p><em>Map</em> 为地图截图， <em>Mask1</em> 和 <em>Map</em> 大小相同，会随着 <em>Map</em> 一起移动， <em>Mask2</em> 是地图UI的可见范围，是固定不动的。</p>
+
+<p><em>Mask2</em> 是美术提供的，和 UI 的尺寸刚好匹配。 现在暂且不考虑怎么生成 <em>Mask2</em> ，就当做已经有这个功能了。那么问题的关键是如何将 <em>Map</em> 上的像素点和 <em>Mask1</em> <em>Mask2</em> 上对应的像素点进行混合，即可得到正确的效果。这里给出关键的着色器代码：</p>
+
+<pre><code>// vertex shader
+float4 vertexInMask1 = mul(_Mask1W2O, mul(_Object2World, v.vertex));
+o.mask1UV = vertexInMask1.xz * 0.1 + 0.5;
+
+float4 vertexInMask2 = mul(_Mask2W2O, mul(_Object2World, v.vertex));
+o.mask2UV = vertexInMask2.xz * 0.1 + 0.5;
+</code></pre>
+
+<p>我们的思路是将 <em>Map</em> 中的顶点变换到 <em>Mask1</em> 的模型坐标中，由于 <em>Mask1</em> 使用的是 Unity 自带的 Plane（尺寸为10个单位长度，-5 到 5），所以乘以 0.1 后加 0.5 将值映射到 0 到 1 之间，而得到的这个值就可以当做 uv 值来使用了，从 <em>Mask1</em> 纹理中采样。 <em>Mask2</em> 同理。</p>
+
+<pre><code>// fragment shader
+fixed4 col = tex2D(_MainTex, i.uv);
+fixed4 mask1C = tex2D(_Mask1Tex, i.mask1UV);
+fixed4 mask2C = tex2D(_Mask2Tex, i.mask2UV);
+col.a *= mask1C.r * mask2C.r;
+return col;
+</code></pre>
+
+<p>将 <em>Map</em> <em>Mask1</em> <em>Mask2</em> 这三张纹理的对应像素进行混合即可，就能得到正确的效果了。还有一点很重要，就是要将 <em>Mask</em> 的 WrapMode 设置为 Clamp，而不是 Repeat，并且 <em>Mask</em> 边缘至少要留一个像素的黑色，这样当计算得到的 uv 值超出 0 到 1 的范围时也能得到正确的结果。</p>
+
+<p>最后说一下如何生成 <em>Mask1</em> 的探索区域纹理。我们是这样做的，首先 <em>Mask1</em> 纹理是要可读写的，创建一个新的线程，在线程中对 Color 数组进行填充，然后在主线程中将 Color 数组写回到 <em>Mask1</em> 纹理中，并提交到 GPU。还有一种方法，就是 <em>Mask1</em> 本身是一张 RenderTexture，使用 Blit 对 <em>Mask1</em> 进行探索区域的填充。我们使用的第一种方法，第二种方法原理上是可行的，但是还有待测试。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
