@@ -2,7 +2,7 @@
 
 **2016-9-?**
 
-Unity 提供了 [Compute Shader][link1] 来使得我们可以将大量的复杂重复的计算交给并行的 GPU 来处理，正是由于并行原因，这样就可以大大加快计算的速度，相比在 CPU 的线程中有着巨大的优势。类似 OpenglES 3.0 的 [Transform Feedback][link2] 和 Metal 的 [Data-Parallel Compute Processing][link3] 都是用来达到同样的目的的。但是很遗憾 Compute Shader 基本和移动设备无缘了，而 Unity 也未能提供给开发者直接驾驭图形接口的能力（[GL.IssuePluginEvent][link4] 似乎可以做到，但是这意味着需要自己处理很多跨平台跨设备的问题，感觉有点得不偿失）。在 [Unity Roadmap][link5] 中也未看到任何类似的迹象。
+Unity 提供了 [Compute Shader][link1] 来使得我们可以将大量的复杂重复的计算交给并行的 GPU 来处理，正是由于并行原因，这样就可以大大加快计算的速度，相比在 CPU 的线程中有着巨大的优势。类似 OpenglES 3.0 的 [Transform Feedback][link2] 和 Metal 的 [Data-Parallel Compute Processing][link3] 都是用来达到同样的目的的。但是很遗憾 Compute Shader 基本和移动设备无缘了，而 Unity 也未能提供给开发者直接驾驭图形接口的能力，（[GL.IssuePluginEvent][link4] 似乎可以做到，但是这意味着需要自己处理很多跨平台跨设备的问题，感觉有点得不偿失）。在 [Unity Roadmap][link5] 中也未看到任何类似的迹象。
 
 [link1]: https://docs.unity3d.com/Manual/ComputeShaders.html
 
