@@ -1,6 +1,6 @@
-######使用 GPU 加速计算
+# 使用 GPU 加速计算
 
-**2016-9-?**
+**2016-9-24**
 
 Unity 提供了 [Compute Shader][link1] 来使得我们可以将大量的复杂重复的计算交给并行的 GPU 来处理，正是由于并行原因，这样就可以大大加快计算的速度，相比在 CPU 的线程中有着巨大的优势。类似 OpenglES 3.0 的 [Transform Feedback][link2] 和 Metal 的 [Data-Parallel Compute Processing][link3] 都是用来达到同样的目的的。但是很遗憾 Compute Shader 基本和移动设备无缘了，而 Unity 也未能提供给开发者直接驾驭图形接口的能力，（[GL.IssuePluginEvent][link4] 似乎可以做到，但是这意味着需要自己处理很多跨平台跨设备的问题，感觉有点得不偿失）。在 [Unity Roadmap][link5] 中也未看到任何类似的迹象。
 
@@ -16,11 +16,13 @@ Unity 提供了 [Compute Shader][link1] 来使得我们可以将大量的复杂�
 
 于是乎一种曲线救国的方式就产生了，当然这里介绍的方法并不能替代 Compute Shader，只是某些特定情况下解决问题的方法，下面我们来仔细看这种方法的实现细节。
 
-其实说来也简单，唯一要用到的就是 RenderTexture。我们可以在 fragment shader 中输出一个颜色值，这个颜色值就是我们经过一系列复杂计算得到的结果，而这些计算本来只能在 CPU 中进行，再通过某种方式（Texture、Mesh、Uniform Value）传给 GPU（这个传递的过程意味着一次 overhead，在移动设备上虽然没有硬件的物理因素，即使是内存共享也意味着内存的拷贝以及图形对象消耗），这个颜色值最终会被写入到相机所绑定的 RenderTexture 上，这样我们就得到了一张包含了很多数据的 RenderTexture，只是这些数据表现为颜色。然后将这张 RenderTexture 传给真正用来渲染的着色器，着色器从 RenderTexture 对应位置取出已经计算好的结果值，使用即可。
+> ![img](ComputeGPUAcc/4.png =400x)
+
+其实说来也简单，唯一要用到的就是 RenderTexture。我们可以在 fragment shader 中输出一个颜色值，这个颜色值就是经过一系列复杂计算得到的结果，而这些计算本来只能在 CPU 中进行，再通过某种方式（Texture、Mesh、Uniform Value）传给 GPU（这个传递的过程意味着一次 overhead，在移动设备上虽然没有硬件的物理因素，即使是内存共享也意味着内存的拷贝以及图形对象消耗），这个颜色值最终会被写入到相机所绑定的 RenderTexture 上，这样就得到了一张包含了很多数据的 RenderTexture，只是这些数据表现为颜色。然后将这张 RenderTexture 传给真正用来渲染的着色器，着色器从 RenderTexture 对应位置取出已经计算好的结果值，使用即可。
 
 > ![img](ComputeGPUAcc/1.gif)
 
-这是一张尺寸为 128x128 的 RenderTexture，其中的每一个像素都存储着一个计算结果，且值会在每一帧中重新计算，这就形成了上图的效果。或许会有这样的疑问，为什么需要将结果存入 RenderTexture，而不是在 Shader 的需要用到的时候直接计算得到呢。这是因为如果是每次都在 Shader 中直接计算出新的结果，就必须有一个符合其数值变化规律的函数：
+这是一张尺寸为 128x128 的 RenderTexture，一共存储了 16384（128x128）个复杂运算的结果，如果将这个计算量交给 CPU 来做的话将会是很大一笔开销，这些值在每一帧中重新计算出新的结果，就形成了上图的效果。或许会有这样的疑问，为什么需要将结果存入 RenderTexture，而不是在 Shader 的需要用到的时候直接计算得到呢。这是因为如果是每次都在 Shader 中直接计算出新的结果，就必须有一个符合其数值变化规律的函数：
 
 \\[\begin{align}
 y &= f(x) \\\
@@ -34,7 +36,9 @@ y &= f(x) \\\
 ------------ | ------------- 
 ![img](ComputeGPUAcc/2.gif) | ![img](ComputeGPUAcc/3.gif) 
 
-如果将顶点的计算放在 CPU 中处理，那么首先意味着会对 CPU 造成巨大的压力，其次计算完成后还要再发送到 GPU 中，这又是一次大消耗，显然是无法接受的。所以我们想到了是否能直接在 GPU 中计算，即加快了计算速度，又避免了传输数据的消耗。但又由于 Compute Shader 在移动平台的无效，所以就有了使用 RenderTexture 的这种方法。
+<embed src='http://player.youku.com/player.php/sid/XMTczNDUzMjk0NA==/v.swf' allowFullScreen='true' quality='high' width='480' height='400' align='middle' allowScriptAccess='always' type='application/x-shockwave-flash'></embed>
+
+于是就想到了是否能直接在 GPU 中计算，即加快了计算速度，又避免了传输数据的消耗。但又由于 Compute Shader 在移动平台的无效，所以就有了使用 RenderTexture 的这种方法。
 
 大致的概念都说清楚了，下面来看一下实现的细节。也就是如何将数据编码到 RenderTexture 中的某个像素中，并且如何从对应的像素中读取数据。
 
@@ -91,7 +95,7 @@ y &= f(x) \\\
 	RenderTexture.active = rt;
 	Graphics.DrawMeshNow
 	
-这里就要开始创建需要渲染 Mesh 了，Mesh 中的每个顶点上的数据都是非常关键的，我们会通过程序代码来创建 Mesh 而不是建模软件，因为顶点中的数据都有其独特的意义，比如说 normal 属性里存储的并不是真正的法线信息，而是我们自己需要的数据。当然如果 Mesh 中每个顶点属性中存储的数据类型完全确定好之后，在 Unity 中实现一个笔刷来让美术刷出这些数据也就并非是难事，这是后话先不说了。
+这里就要开始创建需要渲染 Mesh 了，Mesh 中的每个顶点上的数据都是非常关键的，我们会通过程序代码来创建 Mesh 而不是建模软件，因为顶点中的数据都有其独特的意义，比如说 normal 属性里存储的并不是真正的法线信息，而是我们自己定义的数据。当然如果 Mesh 中每个顶点属性中存储的数据类型完全确定好之后，在 Unity 中实现一个笔刷来让美术刷出这些数据也就并非是难事，这是后话先不说了。
 
 	// C#
 	List<Vector3> vertices = new List<Vector3>();
@@ -148,9 +152,9 @@ y &= f(x) \\\
 		// o.vertex.xy 经过投影变换后的值都是在 -1 到 1 之间
 		//             我们需要知道当前应该输出到 [-1,1] 之间的哪个值上，这就需要在上文中创建 Mesh 时填充顶点数据时指定好，这里直接读取即可
 		// o.vertex.z 这个值我们其实用不到，但是不能随便设置，因为 OpenGL 是 [-1,1]，而 DirectX 是 [0,1]，
-		//            超出这个范围会被裁切掉，所以我们要同时兼顾到，设置为 0
-		// o.vertex.w 这是用来做齐次坐标变换的，将顶点转换到 Canonical View Volume。简单来说最终的会将 xy 除以 w，来转换到齐次裁剪空间坐标系，
-		//            但是我们不希望进行这个操作，所以设置为 1
+		//            超出这个范围会被裁切掉，所以要同时兼顾到，设置为 0
+		// o.vertex.w 这是用来做齐次坐标变换的，将顶点转换到 Canonical View Volume。简单来说最终的会将 o.vertex.xy 除以 w，来转换到齐次裁剪空间坐标系，
+		//            但是我们不希望进行这个操作，以免破坏了精心计算的 o.vertex.xy，所以设置为 1
 		o.vertex = ......;
 		
 		// 这是用来解决平台差异的
@@ -166,6 +170,8 @@ y &= f(x) \\\
 		i.color = ......
 	}
 	
+	// 注意这里的返回值类型，因为用它表示三维空间中的坐标，所以使用 float
+	// 同样 v2f 结构中 color 的类型也要注意
 	float4 frag(v2f i) : SV_Target
 	{
 		return i.color;
