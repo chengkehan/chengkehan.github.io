@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>环境模拟</h1>
+
+<p><strong>2016-10-6</strong></p>
+
+<p>这次要实现的功能是在游戏中能表现出各种环境效果，比如清晨、正午、傍晚、夜晚、雨后、晚霞等等。第一个想到的办法是在每一个用到的着色器中加入相关的代码，使用宏开启或关闭。这种方式是最直接的，后来细想后发现这样做有很多问题：</p>
+
+<ul>
+<li>对原来的着色器代码有一定的侵入性。</li>
+<li>工作量是非常大的，用到的每一种着色器都要添加新的昼夜算法。</li>
+<li>整体效果难以控制，每一种类型的的着色器的参数都各不相同。</li>
+<li>各环境效果之间的过渡。</li>
+</ul>
+
+
+<p>所以暂时放弃了使用这种实现方式。于是通过资料搜索，看到了 <a href="http://amplify.pt/unity/amplify-color/">Amplify Color</a> 这个插件，这个插件使用一种非常巧妙的方式在对屏幕中色彩进行调整。在下面的内容中，我会解释下其实现的原理。在解释原理前，我们先看一下实现的效果，虽然这些效果在物理上并不是完全正确的，但基本达到了想表现出的效果。</p>
+
+<blockquote><p><img src="EnviroumentSimulation/1.gif" width="300" alt="img" /></p>
+
+<p>环境效果模拟测试。各效果之间的过度。</p></blockquote>
+
+<p>基于这个，可以在各天气环境中进行无缝过渡。</p>
+
+<p>从这里开始，我们一步步说明下其中的基本原理。</p>
+
+<blockquote><p><img src="EnviroumentSimulation/6.png" width="600" alt="img" /></p></blockquote>
+
+<p>这是一张基础色条（1024x32 像素），表示在正常显示的情况下，图像的色彩。可以很明显的看到整个色条是由一个个小色块组成，横向一共三十二个小色块，每个小色块的尺寸为 32x32 像素。我们从左往右看：</p>
+
+<ul>
+<li><p>第 1 个小色块，其中所有像素的蓝色分量的值为 0，水平方向上红色分量值从 0 增加到 1，垂直分量上绿色分享的值从 0 增加到 1。右上角为黄色 RGB（1，1，0）。</p></li>
+<li><p>第 2 个小色块，其中所有像素的蓝色分量的值为 $$$ 1 \over 31 $$$，水平方向上红色分量值从 0 增加到 1，垂直分量上绿色分享的值从 0 增加到 1。</p></li>
+<li><p>第 3 个小色块，其中所有像素的蓝色分量的值为 $$$ { 1 \over 31 } \times 2 $$$，水平方向上红色分量值从 0 增加到 1，垂直分量上绿色分享的值从 0 增加到 1。</p></li>
+<li><p>......以此类推</p></li>
+<li><p>第 32 个小色块，其蓝色分量的值为 $$$ { 1 \over 31 } \times 31 $$$，水平方向上红色分量值从 0 增加到 1，垂直分量上绿色分享的值从 0 增加到 1。右上角为白色 RGB（1，1，1）。</p></li>
+</ul>
+
+
+<p>通过这个规律可以看到，在屏幕后处理阶段，当从纹理中采样出颜色值后，先使用颜色值的蓝色分量来确定当前颜色值位于哪个小色块中，然后在用颜色值的红色和绿色分量来精确定位到小色块中的像素。如果这一切都是正确的话，定位到色条上的颜色值应该和纹理采样出的颜色值完全一致。如果我们对整个色条的颜色值进行调整，那么定位到的将不再是相同的值，而是我们调整后的值了。这就是其基本的原理。</p>
+
+<blockquote><p><img src="EnviroumentSimulation/7.png" width="600" alt="img" /></p>
+
+<p>夜晚的色条</p></blockquote>
+
+<p>那么如何对色条中的色彩进行调整呢？这里有一个基本的原则是，最终输出到新色条的颜色值只能依赖于基本色条中对应位置的颜色值。也就是说，比如新色条中位于（3，2）位置的颜色值，必须是从原始色条位于（3，2）的颜色值直接计算而来，不能依赖原始色条其他位置上的颜色值。这就是说，Photoshop 中的各种滤镜都是不能使用的，但是可以使用 Photoshop 中<strong>图像/调整（菜单）</strong>下的所有功能。</p>
+
+<p>注意，这里存在一个问题，因为单个颜色通道能够表示 256 个值，而我们的小色块中只有 32 个值，显然差距很大，但是这个问题对最终的显示效果产生影响很小，几乎察觉不到。这也可能是 Amplify Color 为什么使用蓝色通道作为小色块索引的一个原因，因为自然界中物体色彩的蓝色分量相对较小。而红色绿色通道由于纹理采样时使用了双线性插值，所以也很难察觉到有异常。这些都是我个人的猜测。</p>
+
+<p>通过 Amplify Color 我们可以做出很多炫酷的效果，对整体的画面色调进行调整，不仅仅是昼夜，任何色调的调整都是可以的，并且无缝平滑过渡。由于它是基于一个全屏的后处理效果，所以在性能上存在一定的消耗，但是这个消耗对于游戏整体效果的提升是值得的。我们可以根据这个原理自己优化一个版本，消耗是远远小于 Bloom 的。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
