@@ -1,10 +1,14 @@
-**这个页面是用来收藏一些非常有用的链接**
+这个页面是用来收藏一些非常有用的链接
 
 ## Math
 
 [Math World](http://mathworld.wolfram.com/)
 
 [Math is Fun](https://www.mathsisfun.com/)
+
+[Animated math](http://www.3blue1brown.com/)
+
+[如何直观理解矩阵和线性代数](https://www.zhihu.com/question/21082351)
 
 ---
 
