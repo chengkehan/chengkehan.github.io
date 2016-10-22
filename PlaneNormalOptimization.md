@@ -19,7 +19,6 @@ Shader的优化一般重点都是减少指令的数量，尤其是 Fragment Shad
 	o.TtoW2 = WtoT[2].xyz;
 	
 	// Fragment Shader
-	// 这里将 norm 和 切线空间转到世界空间矩阵 的逆的转置矩阵做相乘，确保法线转换正确
 	fixed3 norm = UnpackNormal(tex2D(_Bump, i.uv));
 	half3 worldNormal = normalize(half3(dot(i.TtoW0.xyz, norm), dot(i.TtoW1.xyz, norm), dot(i.TtoW2.xyz, norm)));
 	
