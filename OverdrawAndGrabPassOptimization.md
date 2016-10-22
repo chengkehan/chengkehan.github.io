@@ -8,12 +8,12 @@
 
 而这种方法的一个问题是，由于 RenderTexture 的分辨率比主屏幕的分辨率小，所以会丢失细节，不适合用来做高频的渲染。所谓高频，就像是技能特效，色彩绚丽分明。而对应低频，就像是烟雾、迷雾、尘埃这一类，细节很少。另一个问题是，当部分需要用到离屏粒子渲染，而部分不需要时，就比较难处理了，因为这牵扯到渲染顺序的问题。最后，由于将 RenderTexture 叠加到主屏幕属于一个 PostEffect 操作，所以存在一定的消耗，这时候需要我们测试下，这种方法带来的好处是否大于一个 PostEffect 的消耗，否则就得不偿失了。
 
-[link1]: [https://forum.unity3d.com/threads/released-off-screen-particles-render-particles-at-1-2-1-4-or-1-8-screen-resolution.358506/]
+[link1]: https://forum.unity3d.com/threads/released-off-screen-particles-render-particles-at-1-2-1-4-or-1-8-screen-resolution.358506/
 
-[link2]: [https://docs.unity3d.com/Manual/SL-CameraDepthTexture.html]
+[link2]: https://docs.unity3d.com/Manual/SL-CameraDepthTexture.html
 
 下面一个优化是关于 [GrabPass][link3] 的。GrabPass 之所以消耗的，是因为当物体将要被渲染时抓取当前屏幕的内容，类似 glCopyTexSubImage2D 这样的大消耗方法。我们在使用 GrabPass 时大多都是进行扰动或者模糊处理，如果不仔细或者慢动作看，是分辨不出 GrabTexture 是不是精确的，所以并不需要一张实时的 GrabTexture。使用一个虚拟相机或使用 [CommandBuffer][link4] 更为合适。对于某些情况，甚至不需要每帧都做 Grab 操作。这样就能节省很多开销了。
 
-[link3]: [https://docs.unity3d.com/Manual/SL-GrabPass.html]
+[link3]: https://docs.unity3d.com/Manual/SL-GrabPass.html
 
-[link4]: [https://docs.unity3d.com/Manual/GraphicsCommandBuffers.html]
+[link4]: https://docs.unity3d.com/Manual/GraphicsCommandBuffers.html
