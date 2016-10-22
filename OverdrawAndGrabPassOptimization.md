@@ -6,7 +6,7 @@
 
 今天看到一种优化 Overdraw 方法，叫做 [OffScreenParticleRendering（离屏粒子渲染）][link1]。其原理是将会产生大量 Overdraw 的物体渲染到 RenderTexture 上，RenderTexture 的尺寸根据需要按照屏幕的分辨率进行缩小，由于分辨率小了，所以产生 Overdraw 的 Fragment 的量也大大减少了。需要注意的是，当渲染到 RenderTexture 上时，需要考虑到深度信息，因为透明的物体也有可能被不透明的物体遮挡住，最简单的方法就是渲染 RenderTexture 时使用 [_CameraDepthTexture][link2] 进行融合，就像做软粒子一样。最后将渲染好的 RenderTexture 叠加到主屏幕上。
 
-而这种方法的一个问题是，由于 RenderTexture 的分辨率比主屏幕的分辨率小，所以会丢失细节，不适合用来做高频的渲染。所谓高频，就像是技能特效，色彩绚丽分明。而对应低频，就像是烟雾、迷雾、尘埃这一类，细节很少。另一个问题是，当部分需要用到离屏粒子渲染，而部分不需要时，就比较难处理了，因为这牵扯到渲染顺序的问题。最后，由于将 RenderTexture 叠加到主屏幕属于一个 PostEffect 操作，所以存在一定的消耗，这时候需要我们测试下，这种方法带来的好处是否大于一个 PostEffect 的消耗，否则就得不偿失了。
+而这种方法的一个问题是，由于 RenderTexture 的分辨率比主屏幕的分辨率小，所以会丢失细节，不适合用来做高频的渲染。所谓高频，就像是技能特效，色彩绚丽分明。而对应低频，就像是烟雾、迷雾、尘埃这一类，细节很少。另一个问题是，当部分需要用到离屏粒子渲染，而部分不需要时，就比较难处理了，因为这牵扯到渲染顺序的问题。最后，由于将 RenderTexture 叠加到主屏幕属于一个 PostEffect 操作，所以存在一定的消耗，这时候需要我们测试下，这种方法带来的好处是否大于一个 PostEffect 的消耗，否则就得不偿失了。如果条件允许，也可以不使用 PostEffect，而直接将 RenderTexture 绘制到一个 Plane 上。
 
 [link1]: https://forum.unity3d.com/threads/released-off-screen-particles-render-particles-at-1-2-1-4-or-1-8-screen-resolution.358506/
 
