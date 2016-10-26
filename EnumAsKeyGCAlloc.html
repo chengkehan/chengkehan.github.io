@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>GCAlloc 问题一则</h1>
+
+<p><strong>2016-10-26</strong></p>
+
+<p>当使用 Enum（枚举类型）作为 Dictionary 的 Key 时会产生 GCAlloc，特别当在 Update 中以及 for 循环中进行时，产生的 GCAlloc 是无法被忽视的。比如下面的测试代码：</p>
+
+<pre><code>public enum ENUM_ABC
+{
+    A, B, C
+}
+
+private Dictionary&lt;ENUM_ABC, Transform&gt; dic = new Dictionary&lt;ENUM_ABC, Transform&gt;();
+
+private void Update()
+{
+    for(int i = 0; i &lt; 10; ++i)
+    {
+        float rnd = Random.value;
+        if(rnd &lt; 0.3f)
+        {
+            dic[ENUM_ABC.A] = transform;
+        }
+        else if (rnd &lt; 0.6f)
+        {
+            dic[ENUM_ABC.B] = transform;
+        }
+        else
+        {
+            dic[ENUM_ABC.C] = transform;
+        }
+    }
+}
+</code></pre>
+
+<blockquote><p><img src="EnumAsKeyGCAlloc/1.png" width="400" alt="img" /></p>
+
+<p>测试代码所产生的 GCAlloc</p></blockquote>
+
+<p>具体原因就是数据的 Boxing，详细解释和解决方案见 <a href="http://stackoverflow.com/questions/26280788/dictionary-enum-key-performance">dictionary enum key performance</a>。</p>
+
+<p>按照链接中的方法我们对代码进行修改，这样就能避免 GCAlloc 了。</p>
+
+<pre><code>// 自定义枚举类型的比较器
+public struct ENUM_ABC_Comparer : IEqualityComparer&lt;ENUM_ABC&gt;
+{
+    public bool Equals(ENUM_ABC x, ENUM_ABC y)
+    {
+        return x == y;
+    }
+
+    public int GetHashCode(ENUM_ABC obj)
+    {
+        return (int)obj;
+    }
+}
+// 创建 Dictionary 时传入自定义比较器
+private Dictionary&lt;ENUM_ABC, Transform&gt; dic = new Dictionary&lt;ENUM_ABC, Transform&gt;(new ENUM_ABC_Comparer());
+</code></pre>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
