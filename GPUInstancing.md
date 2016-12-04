@@ -50,6 +50,6 @@
 
 可以看到消耗反而增加了不少，这些开销完全是 [Graphics.DrawMesh][link3] 带来的。
 
-至于手机上的测试结果，一开始感觉 DrawCall 并没有合并，然后 Frame Debug 了一下，果然发现每一个模型还是单独绘制的，并为找到 [glDrawElementsInstanced][link4] 这样的 API。不知是 Unity 版本的原因，还是 IOS 版本不是最新的。今天就先不管了，升级一次时间太久，等以后自然升级到高版本后再测试下。
+至于手机上的测试结果，一开始感觉 DrawCall 并没有合并，然后 Frame Debug 了一下，果然发现每一个模型还是单独绘制的，并未找到 [glDrawElementsInstanced][link4] 这样的 API。不知是 Unity 版本的原因，还是 IOS 版本不是最新的。今天就先不管了，升级一次时间太久，等以后自然升级到高版本后再测试下。
 
 [link4]: https://www.khronos.org/opengles/sdk/docs/man3/html/glDrawElementsInstanced.xhtml
