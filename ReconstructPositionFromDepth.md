@@ -54,7 +54,7 @@ MultiplyPoint 这个方法是引擎封装好了的，具体的实现是这样的
 要做这个的逆运算就很方便了：
 
 	posInCamSpace.x = posInNDC.x * zLinearEyeDepth / ProjMat[0][0];
-    posInCamSpace.y = posInNDC.y * zLinearEyeDepth / ProjMat[1][1];
+	posInCamSpace.y = posInNDC.y * zLinearEyeDepth / ProjMat[1][1];
     
 在 Shader 中写为：
 

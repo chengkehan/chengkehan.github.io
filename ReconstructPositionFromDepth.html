@@ -56,70 +56,45 @@
 <p>从 Projection Matrix 可以看出，Camera Space 的坐标的 xy 分量在变换的时候，只有第一行和第二行对角线上的两个值参与了（因为气他值是0，可以不考虑），也就是 ProjMat[0][0]、ProjMat[1][1]。所以完全没必要求 Projection Matrix 的逆矩阵。下面我们先正向推导一遍，即从 Camera Space 转换到 NDC。</p>
 
 <pre><code>Matrix4x4 projectionMatrix = camera.projectionMatrix;
-
 Vector3 posInCamSpace = myPos;
-
 Vector3 posInNDC = projectionMatrix.MultiplyPoint(posInCamSpace);
 </code></pre>
 
 <p>MultiplyPoint 这个方法是引擎封装好了的，具体的实现是这样的：</p>
 
 <pre><code>public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
-
 {
-
     Vector3 result;
-
     result.x = mat.m00 * v.x + mat.m01 * v.y + mat.m02 * v.z + mat.m03;
-
     result.y = mat.m10 * v.x + mat.m11 * v.y + mat.m12 * v.z + mat.m13;
-
     result.z = mat.m20 * v.x + mat.m21 * v.y + mat.m22 * v.z + mat.m23;
-
     float num = mat.m30 * v.x + mat.m31 * v.y + mat.m32 * v.z + mat.m33;
-
     num = 1 / num;
-
     result.x *= num;
-
     result.y *= num;
-
     result.z *= num;
-
     return result;
-
 }
 </code></pre>
 
 <p>下面我们将所有相乘后为 0 的值去掉，并且去除 z 分量（因为 z 分量的值可以直接从 Depth-Map 中获取，不需要重建），最后简化为：</p>
 
 <pre><code>public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
-
 {
-
     Vector3 result;
-
     result.x = mat.m00 * v.x;
-
     result.y = mat.m11 * v.y;
-
     float num = mat.m32 * v.z;
-
     num = 1 / num;
-
     result.x *= num;
-
     result.y *= num;
-
     return result;
-
 }
 </code></pre>
 
 <p>要做这个的逆运算就很方便了：</p>
 
 <pre><code>posInCamSpace.x = posInNDC.x * zLinearEyeDepth / ProjMat[0][0];
-
 posInCamSpace.y = posInNDC.y * zLinearEyeDepth / ProjMat[1][1];
 </code></pre>
 
