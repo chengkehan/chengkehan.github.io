@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>整理并扩展一个阴影渲染的实现</h1>
+
+<p><strong>2016-12-25</strong></p>
+
+<p>原始的实现只是 Hard Shadow：</p>
+
+<blockquote><p><img src="SimpleShadow/1.png" width="200" alt="img" /></p></blockquote>
+
+<p>这次增加了局部 ShadowMap（非屏幕中所有物体，而只是需要渲染阴影的物体，这样可以避免深度导致的部分穿帮），以及 Soft Shadow：</p>
+
+<blockquote><p><img src="SimpleShadow/2.png" width="200" alt="img" /></p></blockquote>
+
+<p>并且增加了 Fade Shadow（模拟多光源情况下的阴影淡化效果）：</p>
+
+<blockquote><p><img src="SimpleShadow/3.png" width="200" alt="img" /></p></blockquote>
+
+<p>控制面板上的参数：</p>
+
+<blockquote><p><img src="SimpleShadow/4.png" width="200" alt="img" /></p></blockquote>
+
+<p><a href="https://github.com/chengkehan/XKShadow">Github 项目地址</a>。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
