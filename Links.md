@@ -18,6 +18,8 @@
 
 [selfshadow](http://blog.selfshadow.com/)
 
+[kesen.realtimerendering.com](http://kesen.realtimerendering.com/)
+
 ---
 
 ## PBR
@@ -70,6 +72,12 @@
 ## Tricks
 
 [Animating With Math](http://twvideo01.ubm-us.net/o1/vault/gdc2016/Presentations/Burke_Natalie_AnimatingWithMath.pdf)
+
+---
+
+## Optimization
+
+[Performance Tunning for Tile-Based Architecture](http://www.cnblogs.com/gameknife/p/3515714.html)
 
 ---
 
