@@ -80,6 +80,13 @@ header h2 {
 /* Main Content
 */
 
+.older_posts_class {
+  cursor: pointer;
+  color: #63c0f5;
+  text-shadow: 0 0 5px rgba(104, 182, 255, 0.5);
+  text-decoration: underline;
+}
+
 #main_content {
   width: 100%;
   -webkit-font-smoothing: antialiased;
@@ -125,6 +132,13 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   color: #999;
   margin: 0 0 5px 0;
+}
+
+.green_dash {
+  height: 0;
+  border: 0;
+  border-bottom: 1px dashed #b5e853;
+  color: #b5e853;
 }
 
 dt {
