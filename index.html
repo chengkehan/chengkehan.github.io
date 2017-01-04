@@ -59,21 +59,24 @@ $.ajax( {
 
 function mScroll(id){$("html,body").stop(true);$("html,body").animate({scrollTop: $("#"+id).offset().top}, 1000);} 
 
-function toggle_older_posts_div()
+function toggle_older_posts_div(animatedCollapse)
 {
-    $("#older_posts_div").toggle();
     if($("#older_posts_div").is(":hidden")){
-        $("#older_posts").html("更早的文章 >>");
-
-     }else{
+        $("#older_posts_div").toggle();
         $("#older_posts").html("更早的文章 <<");
         mScroll("older_posts_div");
+     }else{
+     	if(animatedCollapse)
+     		$("#older_posts_div").toggle("normal");
+     	else
+     		$("#older_posts_div").toggle();
+		$("#older_posts").html("更早的文章 >>");
      }
 }
 
 $(function(){
     $("#older_posts").click(function(){
-         toggle_older_posts_div();
+         toggle_older_posts_div(true);
     })
 })
 </script>
@@ -186,7 +189,7 @@ $(function(){
       </section>
     </div>
 
-<script type="text/javascript">toggle_older_posts_div();</script>
+<script type="text/javascript">toggle_older_posts_div(false);</script>
     
   </body>
 </html>
