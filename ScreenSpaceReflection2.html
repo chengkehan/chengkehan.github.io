@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Screen Space Reflection 2</h1>
+
+<p><strong>2017-1-14</strong></p>
+
+<p>基于上个版本的屏幕空间反射做了几点改进：</p>
+
+<ul>
+<li>将物体的厚度考虑了进来，不再是固定的厚度值。使用物体真实厚度的好处是射线检测更加精确，得到的效果更好。</li>
+<li>反射相交检测基于屏幕像素步进，避免基于三维空间步进时的缺陷。三维空间中的线段，由于透视关系，同等的长度投射到屏幕上的像素点数量并不相同，这就导致了和屏幕接近平行时，一次步进可以跨过很多个像素，而和屏幕接近垂直时，多次步进只跨过一个像素点。这种不平均会造成计算上的浪费以及渲染效果的错误。</li>
+</ul>
+
+
+<p><a href="https://github.com/chengkehan/DeferredRendering">Github 项目地址</a>。</p>
+
+<p>当前版本的截图。渲染效果比上个版本有了一定的提高。</p>
+
+<p>还有一个有待解决的问题是：由于屏幕空间只能记录最上层物体的厚度，当反射射线位于两个物体之间的时候，就会出现深度判断上的问题，导致渲染效果出错。</p>
+
+<blockquote><p><img src="ScreenSpaceReflection2/1.jpg" width="600" alt="img" /></p></blockquote>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
