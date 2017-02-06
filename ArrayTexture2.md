@@ -1,6 +1,6 @@
 # Texture2DArray(2)
 
-**2016-12-1**
+**2017-2-6**
 
 补充之前一篇介绍 [ArrayTexture 的文章][link1]。
 

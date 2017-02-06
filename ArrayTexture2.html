@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Texture2DArray(2)</h1>
+
+<p><strong>2017-2-6</strong></p>
+
+<p>补充之前一篇介绍 <a href="ArrayTexture.html">ArrayTexture 的文章</a>。</p>
+
+<p>离线生成 ArrayTexture 的方法：</p>
+
+<pre><code>Texture2DArray t = new Texture2DArray(256, 256, textures.Length, TextureFormat.ETC_RGB4, false);
+for(int i = 0; i &lt; textures.Length; ++i)
+{
+    Graphics.CopyTexture(textures[i], 0, 0, t, i, 0);
+}
+t.Apply();
+AssetDatabase.CreateAsset(t, "Assets/texarr.asset");
+</code></pre>
+
+<p>上面代码中，生成的 ArrayTexture 是 ETC 这种压缩格式，注意 textures 数组里每张纹理也都必须是对应的格式。那么问题就来了，普通的纹理格式 Unity 提供了一个方便的方式来设置不同平台下的压缩格式，可是 ArrayTexture 却没有，不同平台之间的格式管理就很困难了。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
