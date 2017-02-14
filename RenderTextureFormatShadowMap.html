@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>RenderTextureFormat.ShadowMap</h1>
+
+<p><strong>2017-2-14</strong></p>
+
+<p>RenderTextureFormat.ShadowMap 对应一种硬件可直接读取的 RenderTexture 格式，使用这种格式的好处是硬件对于这种格式可以自行进行 PCF（Percentage Closer Filter），不需要我们在着色器中实现 PCF，优势是硬件内置的 PCF 比自己在着色器中实现性能要好。</p>
+
+<p>示例代码：</p>
+
+<pre><code>// App
+RenderTexture rt = new RenderTexture(width, height, 24/*depth*/, RenderTextureFormat.Shadowmap, RenderTextureReadWrite.Linear);
+rt.useMipMap = false;
+rt.filterMode = FilterMode.Bilinear;
+Shader.SetGlobalTexture("_Shadowmap", rt);
+
+// Shader
+Texture2D _Shadowmap; 
+SamplerComparisonState sampler_Shadowmap;
+
+float objDepth = ...;
+float shadow = _Shadowmap.SampleCmpLevelZero(sampler_Shadowmap, uv, objDepth);
+</code></pre>
+
+<p>要得到正确的 pcf，filterMode 必须是 Bilinear，而不能是 Point。SampleCmpLevelZero 是将采样到的值与 objDepth 进行比较，未通过 shadowmap 比较返回 0，通过 shadowmap 比较后，根据纹理过滤模式对周围点进行采样比较并进行混合，最终返回一个 0 到 1 的值。</p>
+
+<p>上面的代码中只进行了一次 pcf，所以软阴影效果不明显，但是比锯齿状的硬边好很多了，如果需要更软的阴影，需要更多的纹理采样和 PCF。最后注意 RenderTextureFormat.ShadowMap 这种格式不是所有硬件都支持的。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
