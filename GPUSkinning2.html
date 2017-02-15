@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>GPUSkinning 2</h1>
+
+<p><strong>2017-2-15</strong></p>
+
+<p>补充以前的一篇 <a href="GPUSkinning.html">GPUSkinning</a> 的实现，从最终的效果图可以看到，所有角色的动作都是同步的，这里进行了改进，不再使用 <a href="https://docs.unity3d.com/ScriptReference/Material.SetMatrixArray.html">uniform array</a> 的方式来传递数据，而是将骨骼动画数据存储到了纹理中，并加以一定的差异化，避免了所有角色的动作完全同步的问题。</p>
+
+<blockquote><p><img src="GPUSkinning2/1.gif" width="280" alt="img" /></p></blockquote>
+
+<p><a href="https://github.com/chengkehan/GPUSkinning">项目@github</a></p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
