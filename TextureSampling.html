@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>纹理采样</h1>
+
+<p><strong>2017-3-1</strong></p>
+
+<p>压缩的纹理格式在显存中是以块（Block）的形式存在的，也就是说显示上相邻的像素在显存中也是相邻的。这样 GPU 就能迅速的将块加载到 Cache 中，并对块进行解码，解码一个块即得到多个 texel 数据（数据的多少由块的大小决定）。如果 GPU在一个时钟周期可以有能力加载并解码多个块，就能将更多的数据存放到 Cache 中，让缓存更多的命中。</p>
+
+<p>GPU 被设计为这种策略其实是对绝大多数情况的一个假设性优化。光栅化后的 fragment 的执行顺序并不是随机的，不同的 GPU 会有不同的执行顺序，但都是以块（Block）为单位（块的大小由 GPU 的运算能力决定）。相邻的 fragment 被归在一个块内，同一个块内的每个 fragment 中的指令是以完全同步的方式一条条执行的（如果有动态分支，并且执行了不同分支，那么相同块中的所有 fragment 就不能完全同步一条条执行指令了）。所以对于同一个块内相邻 fragment 的纹理采样，并不需要每次都从显存中加载纹理数据并解压，因为数据已经在 Cache 中，所以直接读取即可。非同一个块内，相邻的 fragment 纹理采样也能享受到 Cache 带来的好处。这样大大提高了纹理采样的效率。我们可以认为 Cache 是 GPU 核心内部的一块高速缓冲，所以和 GPU 交换数据速度非常快，远远快于 GPU 直接从显存读取数据。</p>
+
+<p>之所以说其是一种假设性优化，因为这种策略并不能适用于所有情况。当采样纹理 texel 不在 Cache 中时，称为 Cache Missing，上述方法可以将 Cache Missing 降低到比较小的值，当出现 Cache Missing 时，GPU 只能从显存中读取数据了。在下面的两个案例中，故意违反这种 Cache 策略，以此来看下性能的开销。</p>
+
+<h3>Case 1</h3>
+
+<blockquote><p><img src="TextureSampling/2.jpg" height="250" alt="img" /></p></blockquote>
+
+<p>渲染一个 8 千面的地形，采用多层纹理按权重叠加的方式。</p>
+
+<blockquote><p><img src="TextureSampling/1.jpg" height="250" alt="img" /></p></blockquote>
+
+<p>从 Profile 上可以看到，GPU 的开销为 1.172 毫秒。</p>
+
+<blockquote><p><img src="TextureSampling/3.jpg" height="250" alt="img" /></p></blockquote>
+
+<p>开启纹理的 Mipmaps。GPU 开销降到了 0.326 毫秒。</p>
+
+<p>为什么是否开启 Mipmaps 会对开销有如此大的影响，其实和上文说的 Cache 策略有关。在这个案例中，地形的 Tiling 为 60，并且未开启 Mipmaps，由于透视关系和光栅化，fragment 对纹理的采样并不是连续的，而是跳跃的，这就造成了 Cache Missing，远处地形相比近处更是如此。而开启 Mipmaps 后，就能大大缓解这种情况，因为对于远处的地形会使用 Level 更大的 Mipmaps，这些 Mipmaps 的尺寸本身就很小，更容易被缓存命中，所以性能大大提升了。同理，如果不开启 Mipmaps，而是将 Tiling 设置为较小的值，开销也会显著下降。</p>
+
+<h3>Case 2</h3>
+
+<p>渲染一个 Quad 平铺整个屏幕。</p>
+
+<pre><code>fixed4 frag (v2f i) : SV_Target
+{
+    fixed4 rnd = tex2D(_RndTex, i.uv);
+    fixed4 col = tex2D(_MainTex, i.uv + rnd.rg);
+    return col;
+}
+</code></pre>
+
+<p>在 fragment 中并没有直接使用应用程序传入的 uv 值对 _MainTex 进行采样，而是让 uv 叠加一个随机量（rnd），随机量（rnd）来自于另一张纹理 _RndTex。</p>
+
+<blockquote><p><img src="TextureSampling/4.jpg" width="100" alt="img" /></p>
+
+<p>_RndTex</p>
+
+<p><img src="TextureSampling/6.jpg" height="150" alt="img" /><img src="TextureSampling/5.jpg" height="150" alt="img" /></p>
+
+<p>第一个 Profile，使用的 _RndTex 是上面的随机噪点纹理。第二个 Profile，使用的 _RndTex 是一张纯色的纹理。</p></blockquote>
+
+<p>上图两个 Profile 中的时间开销相差一倍，这也是 Cache Missing 造成的。</p>
+
+<p>通过以上分析，纹理采样这种不起眼的地方，如果一时疏忽也会存在很大的开销，优化时需要密切关注。</p>
+
+<hr />
+
+<h3>References：</h3>
+
+<p><a href="http://madstrawberry.me/unreliable-translate/A-trip-through-the-Graphics-Pipeline-2011-translate(4).html">3D管线之旅：纹理采样器</a></p>
+
+<p><a href="https://forum.unity3d.com/threads/performance-issue-on-texture-bandwidth.450381/#post-2915575">performance issue on texture bandwidth</a></p>
+
+<p><a href="https://www.g-truc.net/post-0662.html">How bad are small triangles on GPU and why?</a></p>
+
+<p><a href="https://zhuanlan.zhihu.com/p/22232448">GPU画像素的顺序是什么</a></p>
+
+<p><a href="http://aras-p.info/blog/2016/11/05/Interview-questions/">When a GPU samples a texture, how does it pick which mipmap level to read from?</a></p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
