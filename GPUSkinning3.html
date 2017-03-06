@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">返回目录</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>GPUSkinning 3</h1>
+
+<p><strong>2017-3-6</strong></p>
+
+<p>继续对 GPUSkinning 进行改进。这次增加了两个 feature，增加了 <a href="https://docs.unity3d.com/Manual/GPUInstancing.html">GPU Instancing</a>，以及 <a href="https://docs.unity3d.com/ScriptReference/Graphics.DrawProcedural.html">Procedural Drawing</a></p>
+
+<blockquote><p><img src="GPUSkinning3/1.jpg" width="400" alt="img" /></p></blockquote>
+
+<p>在使用了 GPU Instancing 后，绘制 400 个角色模型只用 4 个 Batches，而原来每绘制一个角色模型都会产生 1 个 Batch 的开销。</p>
+
+<blockquote><p><img src="GPUSkinning3/2.png" width="250" alt="img" /><img src="GPUSkinning3/3.png" width="250" alt="img" /></p>
+
+<p>GPU 开销从 5.149 毫秒降低到了 3.546 毫秒。</p></blockquote>
+
+<p>增加了 Procedural Drawing 后，可以看到 fps 增加了，可以绘制更多的角色模型了。</p>
+
+<blockquote><p><img src="GPUSkinning3/4.jpg" height="93" alt="img" /><img src="GPUSkinning3/5.jpg" height="93" alt="img" /></p>
+
+<p>多绘制了一倍的角色模型，fps 反而增加很多，这说明 Procedural Drawing 更充分的利用了 GPU 的能力。图中 Unity 的 Statistics 窗口中无法统计到 Procedural 绘制的三角面。</p></blockquote>
+
+<p>对于 Procedural Drawing 还有一个问题有待解决，目前每个角色的坐标、旋转都是存储在 ComputeBuffer 中，当角色坐标、旋转发生改变的话就必须刷新 ComputeBuffer，这个操作的开销是非常大的。</p>
+
+<p><a href="https://github.com/chengkehan/GPUSkinning">项目@github</a></p>
+
+<hr />
+
+<p>补充：新增 feature，通过 <a href="https://docs.unity3d.com/Manual/CullingGroupAPI.html">CullingGroup</a> 增加 LOD 功能。远处的角色使用减面后的模型进行渲染。</p>
+
+<blockquote><p><img src="GPUSkinning3/6.jpg" height="130" alt="img" /><img src="GPUSkinning3/7.jpg" height="130" alt="img" /></p>
+
+<p>开启 LOD 后，GPU 开销从 0.924 毫秒降低到了 0.512 毫秒。</p>
+
+<p><img src="GPUSkinning3/8.jpg" height="140" alt="img" /><img src="GPUSkinning3/9.jpg" height="140" alt="img" /></p>
+
+<p>开启 LOD 后，在保证渲染效果的前提下，使用了更少的三角面，从原来的 100万 降低到了 29万。</p></blockquote>
+
+<p>以上测试为开启 GPU Instancing，并且仅有一层 LOD 时的效果。根据项目需要，可自己定制多层 LOD。</p>
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
