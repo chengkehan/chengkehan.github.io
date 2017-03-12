@@ -63,14 +63,14 @@ function toggle_older_posts_div(animatedCollapse)
 {
     if($("#older_posts_div").is(":hidden")){
         $("#older_posts_div").toggle();
-        $("#older_posts").html("更早的文章 <<");
+        $("#older_posts").html("More Posts <<");
         mScroll("older_posts_div");
      }else{
      	if(animatedCollapse)
      		$("#older_posts_div").toggle("normal");
      	else
      		$("#older_posts_div").toggle();
-		$("#older_posts").html("更早的文章 >>");
+		$("#older_posts").html("More Posts >>");
      }
 }
 
@@ -87,6 +87,7 @@ $(function(){
         <hr class="green_dash" />
         <br>
         <h3>2017 年 3 月</h3>
+        <a href="GPUSkinning4.html">GPUSkinning 4</a><br><br>
         <a href="GPUSkinning3.html">GPUSkinning 3</a><br><br>
         <a href="TextureSampling.html">纹理采样</a><br><br>
         <h3>2017 年 2 月</h3>
