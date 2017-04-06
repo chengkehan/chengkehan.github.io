@@ -2,18 +2,53 @@
 
 **2016-11-27**
 
-> ![img](GPUSkinning/1.jpg =600x)
-> ![img](GPUSkinning/6.jpg =600x)
+>  <img src="GPUSkinning/1.jpg" width="600"/>
+>  <img src="GPUSkinning/6.jpg" width="600"/>
 >
 > 使用了 ShadowGun 中的角色模型
 
 当场景中有很多人物动画模型的时候会产生大量开销，这些开销除了 DrawCall 外，很大一部分来自于骨骼动画。Unity 内置提供了 GPU Skinning 的功能，但我测试下来并没有对整体性能有任何提升，反而整体的开销增加了不少。有很多种方法来减小骨骼动画的开销，每一种方法都有其利弊，都不是万金油，这里介绍的方法同样如此。其实本质还是 GPU Skinning，由我们自己来实现，但是和 Unity 内置的 GPU Skinning 有所区别。
 
-> ![img](GPUSkinning/2.jpg =400x)
->
+> <img src="GPUSkinning/2.jpg" width="400"/>
+> 
 > 开启 Unity 内置的 GPU Skinning
 
-从上图中可以看到，Unity 调用到了 Opengl ES 的 Transform Feedback 接口，这个接口至少要到 OpenGL ES 3.0 才有。我理解的 Transform Feedback，就是将大批的数据传递给 Vertex Shader，将 GPU 计算过后的结果通过一个 Buffer Object 返回到 CPU 中，CPU 再从 Buffer Object 读取数据（或直接将 Buffer Object 传递给下一步）在随后步骤中使用。显然，在骨骼动画中，Transform Feedback 负责骨骼变换，Unity 将变换后的结果拿来再进行 GPU 蒙皮操作。
+从上图中可以看到，Unity 调用到了 Opengl ES 的 Transform Feedback 接口，这个接口至少要到 OpenGL ES 3.0 才有。<del>我理解的 Transform Feedback，就是将大批的数据传递给 Vertex Shader，将 GPU 计算过后的结果通过一个 Buffer Object 返回到 CPU 中，CPU 再从 Buffer Object 读取数据（或直接将 Buffer Object 传递给下一步）在随后步骤中使用。显然，在骨骼动画中，Transform Feedback 负责骨骼变换，Unity 将变换后的结果拿来再进行 GPU 蒙皮操作。</del>
+
+---
+
+_**2017-4-6:上面删除的那句话为我的理解错误，感谢知乎上[燃野](https://www.zhihu.com/people/yesbaba/answers)和[peter liu](https://www.zhihu.com/people/peter-liu-80-97/answers)的指正，详见[这篇文章](https://zhuanlan.zhihu.com/p/26200956?group_id=833288008760451072)后的评论。GLES3-Transform Feedback，DirectX 11-StreamOut。为此我又去仔细看了下细节，在开启 GPUSkinning 的时候，Unity 确实已经在 CPU 中进行了骨骼变换，而后将矩阵数组传递给 Shader，通过 Transform Feedback 后，将结果存储到 Buffer Object 中，这时 Buffer Object 中存储的顶点数据已经是蒙皮完成了，最后渲染模型的时候直接拿来用即可。下面这段 glsl 既是输出 Transform Feedback 的，也证明了这点。**_
+
+	#version 300 es
+
+	const int max_bone_count = 32;
+	const highp float max_bone_count_inv = 1.0 / float(max_bone_count); 
+	const highp float half_texel = 0.5 * max_bone_count_inv; 
+	in vec3 in_vertex;
+	in vec3 in_normal;
+	in vec4 in_tangent;
+	in ivec2 in_boneIndices;
+	in vec2  in_boneWeights;
+	out vec3 out_pos;
+	out vec3 out_normal;
+	out vec4 out_tangent;
+
+	uniform vec4 bones[max_bone_count*3];
+	#define GET_MATRIX(idx) mat4( bones[int(idx)*3 + 0], bones[int(idx)*3 + 1], bones[int(idx)*3 + 2], vec4(0.0, 0.0, 0.0, 1.0))
+
+	void main(void)
+	{
+		vec4 inpos = vec4(in_vertex.xyz, 1.0);
+		mat4 localToWorldMatrix = GET_MATRIX(in_boneIndices.x) * in_boneWeights[0];
+		if(in_boneWeights[1] > 0.0)
+			localToWorldMatrix += GET_MATRIX(in_boneIndices.y) * in_boneWeights[1] ;
+	 	out_pos = (inpos * localToWorldMatrix).xyz;
+		gl_Position = vec4(out_pos.xyz, 1.0);
+		out_normal = normalize( ( vec4(in_normal.xyz, 0.0) * localToWorldMatrix)).xyz;
+		out_tangent = vec4( normalize( ( vec4(in_tangent.xyz, 0.0) * localToWorldMatrix)).xyz, in_tangent.w);
+	}
+
+---
 
 这次我们要动手实现的就是这个过程，但是不使用 Transform Feedback，因为要保证在 OpenGL ES 2.0 上也能良好运行，况且引擎也没有提供这么底层的接口。
 
@@ -27,7 +62,7 @@
 
 ### 提取骨骼动画数据
 
-> ![img](GPUSkinning/3.jpg =600x)
+> <img src="GPUSkinning/3.jpg" width="600"/>
 >
 > Unity 中的 Animation 数据
 
@@ -144,8 +179,8 @@ Bindpose 的作用是将模型空间中的顶点坐标变换到骨骼空间中�
         newMtrl.SetMatrixArray(shaderPropID_Matrices/*_Matrices*/, matricesUniformBlock);
     }
 	
-> ![img](GPUSkinning/4.jpg =400x)
-> ![img](GPUSkinning/5.jpg =400x)
+>  <img src="GPUSkinning/4.jpg" width="400"/>
+>  <img src="GPUSkinning/5.jpg" width="400"/>
 >
 > 由于骨骼数量固定为 24，所以图中的 96 = 24 x 4
 
@@ -202,6 +237,6 @@ Bindpose 的作用是将模型空间中的顶点坐标变换到骨骼空间中�
 
 以上就是所有的关于自己实现 GPU Skinning 的细节。没有一种方法是完美的，作为能够减少骨骼动画开销的备选方案之一，在恰当的情况下使用会大大的提高性能。
 
-> ![img](GPUSkinning/7.gif)
+>  <img src="GPUSkinning/7.gif"/>
 
 [附 Demo 工程源码](GPUSkinning/GPUSkinning.zip)

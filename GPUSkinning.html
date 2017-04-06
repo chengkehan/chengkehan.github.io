@@ -36,22 +36,61 @@
 
     <div class="container">
       <section id="main_content">
-<h1>GPU Skinning</h1>
+<h1 id="toc_0">GPU Skinning</h1>
 
 <p><strong>2016-11-27</strong></p>
 
-<blockquote><p><img src="GPUSkinning/1.jpg" width="600" alt="img" />
-<img src="GPUSkinning/6.jpg" width="600" alt="img" /></p>
+<blockquote>
+<p><img src="GPUSkinning/1.jpg" width="600"/>
+ <img src="GPUSkinning/6.jpg" width="600"/></p>
 
-<p>使用了 ShadowGun 中的角色模型</p></blockquote>
+<p>使用了 ShadowGun 中的角色模型</p>
+</blockquote>
 
 <p>当场景中有很多人物动画模型的时候会产生大量开销，这些开销除了 DrawCall 外，很大一部分来自于骨骼动画。Unity 内置提供了 GPU Skinning 的功能，但我测试下来并没有对整体性能有任何提升，反而整体的开销增加了不少。有很多种方法来减小骨骼动画的开销，每一种方法都有其利弊，都不是万金油，这里介绍的方法同样如此。其实本质还是 GPU Skinning，由我们自己来实现，但是和 Unity 内置的 GPU Skinning 有所区别。</p>
 
-<blockquote><p><img src="GPUSkinning/2.jpg" width="400" alt="img" /></p>
+<blockquote>
+<p><img src="GPUSkinning/2.jpg" width="400"/></p>
 
-<p>开启 Unity 内置的 GPU Skinning</p></blockquote>
+<p>开启 Unity 内置的 GPU Skinning</p>
+</blockquote>
 
-<p>从上图中可以看到，Unity 调用到了 Opengl ES 的 Transform Feedback 接口，这个接口至少要到 OpenGL ES 3.0 才有。我理解的 Transform Feedback，就是将大批的数据传递给 Vertex Shader，将 GPU 计算过后的结果通过一个 Buffer Object 返回到 CPU 中，CPU 再从 Buffer Object 读取数据（或直接将 Buffer Object 传递给下一步）在随后步骤中使用。显然，在骨骼动画中，Transform Feedback 负责骨骼变换，Unity 将变换后的结果拿来再进行 GPU 蒙皮操作。</p>
+<p>从上图中可以看到，Unity 调用到了 Opengl ES 的 Transform Feedback 接口，这个接口至少要到 OpenGL ES 3.0 才有。<del>我理解的 Transform Feedback，就是将大批的数据传递给 Vertex Shader，将 GPU 计算过后的结果通过一个 Buffer Object 返回到 CPU 中，CPU 再从 Buffer Object 读取数据（或直接将 Buffer Object 传递给下一步）在随后步骤中使用。显然，在骨骼动画中，Transform Feedback 负责骨骼变换，Unity 将变换后的结果拿来再进行 GPU 蒙皮操作。</del></p>
+
+<hr>
+
+<p><em><strong>2017-4-6:上面删除的那句话为我的理解错误，感谢知乎上<a href="https://www.zhihu.com/people/yesbaba/answers">燃野</a>和<a href="https://www.zhihu.com/people/peter-liu-80-97/answers">peter liu</a>的指正，详见<a href="https://zhuanlan.zhihu.com/p/26200956?group_id=833288008760451072">这篇文章</a>后的评论。GLES3-Transform Feedback，DirectX 11-StreamOut。为此我又去仔细看了下细节，在开启 GPUSkinning 的时候，Unity 确实已经在 CPU 中进行了骨骼变换，而后将矩阵数组传递给 Shader，通过 Transform Feedback 后，将结果存储到 Buffer Object 中，这时 Buffer Object 中存储的顶点数据已经是蒙皮完成了，最后渲染模型的时候直接拿来用即可。下面这段 glsl 既是输出 Transform Feedback 的，也证明了这点。</strong></em></p>
+
+<div><pre><code>#version 300 es
+
+const int max_bone_count = 32;
+const highp float max_bone_count_inv = 1.0 / float(max_bone_count); 
+const highp float half_texel = 0.5 * max_bone_count_inv; 
+in vec3 in_vertex;
+in vec3 in_normal;
+in vec4 in_tangent;
+in ivec2 in_boneIndices;
+in vec2  in_boneWeights;
+out vec3 out_pos;
+out vec3 out_normal;
+out vec4 out_tangent;
+
+uniform vec4 bones[max_bone_count*3];
+#define GET_MATRIX(idx) mat4( bones[int(idx)*3 + 0], bones[int(idx)*3 + 1], bones[int(idx)*3 + 2], vec4(0.0, 0.0, 0.0, 1.0))
+
+void main(void)
+{
+    vec4 inpos = vec4(in_vertex.xyz, 1.0);
+    mat4 localToWorldMatrix = GET_MATRIX(in_boneIndices.x) * in_boneWeights[0];
+    if(in_boneWeights[1] &gt; 0.0)
+        localToWorldMatrix += GET_MATRIX(in_boneIndices.y) * in_boneWeights[1] ;
+    out_pos = (inpos * localToWorldMatrix).xyz;
+    gl_Position = vec4(out_pos.xyz, 1.0);
+    out_normal = normalize( ( vec4(in_normal.xyz, 0.0) * localToWorldMatrix)).xyz;
+    out_tangent = vec4( normalize( ( vec4(in_tangent.xyz, 0.0) * localToWorldMatrix)).xyz, in_tangent.w);
+}</code></pre></div>
+
+<hr>
 
 <p>这次我们要动手实现的就是这个过程，但是不使用 Transform Feedback，因为要保证在 OpenGL ES 2.0 上也能良好运行，况且引擎也没有提供这么底层的接口。</p>
 
@@ -63,30 +102,31 @@
 <li>将骨骼变换的结果传递给 GPU，进行蒙皮。</li>
 </ul>
 
-
 <p>很简单的三大步，对于传统的骨骼动画来说没有任何特殊的步骤，下面我会对其中的每一步展开说明，并将其中的细节说清楚。</p>
 
-<h3>提取骨骼动画数据</h3>
+<h3 id="toc_1">提取骨骼动画数据</h3>
 
-<blockquote><p><img src="GPUSkinning/3.jpg" width="600" alt="img" /></p>
+<blockquote>
+<p><img src="GPUSkinning/3.jpg" width="600"/></p>
 
-<p>Unity 中的 Animation 数据</p></blockquote>
+<p>Unity 中的 Animation 数据</p>
+</blockquote>
 
 <p>目的就是将这些数据提取出来，存储到自定义的数据结构中。代码大致是这样的：</p>
 
-<pre><code>EditorCurveBinding[] curvesBinding = AnimationUtility.GetCurveBindings(animClip);
+<div><pre><code>EditorCurveBinding[] curvesBinding = AnimationUtility.GetCurveBindings(animClip);
 foreach(var curveBinding in curvesBinding)
 {
     // 旋转
-    AnimationCurve curveRX = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalRotation.x");
-    AnimationCurve curveRY = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalRotation.y");
-    AnimationCurve curveRZ = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalRotation.z");
-    AnimationCurve curveRW = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalRotation.w");
+    AnimationCurve curveRX = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalRotation.x&quot;);
+    AnimationCurve curveRY = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalRotation.y&quot;);
+    AnimationCurve curveRZ = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalRotation.z&quot;);
+    AnimationCurve curveRW = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalRotation.w&quot;);
 
     // 位移
-    AnimationCurve curvePX = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalPosition.x");
-    AnimationCurve curvePY = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalPosition.y");
-    AnimationCurve curvePZ = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, "m_LocalPosition.z");
+    AnimationCurve curvePX = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalPosition.x&quot;);
+    AnimationCurve curvePY = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalPosition.y&quot;);
+    AnimationCurve curvePZ = AnimationUtility.GetEditorCurve(animClip, curveBinding.path, curveBinding.type, &quot;m_LocalPosition.z&quot;);
 
     // 不考虑缩放，假定所有骨骼的缩放都是 1
 
@@ -105,21 +145,20 @@ foreach(var curveBinding in curvesBinding)
     matrices.Add(
         Matrix4x4.TRS(translation, rotation, Vector3.one)
     );
-}
-</code></pre>
+}</code></pre></div>
 
 <p>其中有两个注意点。第一，要清楚 AnimationCurve 中提取出来的旋转量是欧拉角还是四元数，这里我一开始就弄错了，想当然认为是欧拉角，所以随后计算得到的结果也就错了。第二，用来旋转的四元数，必须是单位四元数（模是1），否则你会得到 Unity 的一个报错信息。</p>
 
 <p>以上的代码中，我将每一帧的数据以 30fps 的频率直接采样了出来，其实也可以不采样出来，而是等需要的时候再从 AnimationCurve 中采样，这样会更平滑但是运行时的计算量也更多了。</p>
 
-<h3>骨骼变换</h3>
+<h3 id="toc_2">骨骼变换</h3>
 
 <p>骨骼变换是所有代码的核心部分了，看似挺复杂，其实想清楚后代码量是最少的:</p>
 
-<pre><code>private void Update()
+<div><pre><code>private void Update()
 {
     // 更新 Walk 动作的所有骨骼变换
-    UpdateBoneAnimationMatrix("Walk", second);
+    UpdateBoneAnimationMatrix(&quot;Walk&quot;, second);
     second += Time.deltaTime;
 }
 
@@ -150,8 +189,7 @@ private void UpdateBoneTransformMatrix(GPUSkinning_Bone bone, Matrix4x4 parentMa
     {
         UpdateBoneTransformMatrix(children[i], mat, frame);
     }
-}
-</code></pre>
+}</code></pre></div>
 
 <p>简单来说骨骼变换就是一个矩阵乘法，比如 bone0（简写为b0） 是 bone1（简写为b1） 的父骨骼：</p>
 
@@ -163,11 +201,11 @@ private void UpdateBoneTransformMatrix(GPUSkinning_Bone bone, Matrix4x4 parentMa
 
 <p>Bindpose 的作用是将模型空间中的顶点坐标变换到骨骼空间中（是骨骼矩阵的逆矩阵），然后应用当前骨骼的变换，沿着层级关系一层层的变换下去。</p>
 
-<h3>蒙皮</h3>
+<h3 id="toc_3">蒙皮</h3>
 
-<pre><code>private void Update()
+<div><pre><code>private void Update()
 {
-    UpdateBoneAnimationMatrix("Walk", second);
+    UpdateBoneAnimationMatrix(&quot;Walk&quot;, second);
     Play();
     second += Time.deltaTime;
 }
@@ -185,19 +223,20 @@ private void Play()
     // 以前是不能直接传一个数组的，只能一个个元素单独传，效率很低
     // 新的 API 减小了开销（看下图）
     newMtrl.SetMatrixArray(shaderPropID_Matrices/*_Matrices*/, matricesUniformBlock);
-}
-</code></pre>
+}</code></pre></div>
 
-<blockquote><p><img src="GPUSkinning/4.jpg" width="400" alt="img" />
-<img src="GPUSkinning/5.jpg" width="400" alt="img" /></p>
+<blockquote>
+<p><img src="GPUSkinning/4.jpg" width="400"/>
+ <img src="GPUSkinning/5.jpg" width="400"/></p>
 
-<p>由于骨骼数量固定为 24，所以图中的 96 = 24 x 4</p></blockquote>
+<p>由于骨骼数量固定为 24，所以图中的 96 = 24 x 4</p>
+</blockquote>
 
 <p>使用 SetMatrixArray 其实有点浪费了，因为对于一个 4x4 的矩阵（四个float4）来说，最后一维永远是 （0, 0, 0, 1），所以可以使用 3x4的矩阵（三个float4）代替，这样就减少了数据传递的压力。</p>
 
 <p>现在所有的骨骼变换矩阵已经传递到 Shader 中了，就可以使用这些数据来蒙皮（变换顶点坐标）</p>
 
-<pre><code>// 模型确定为 24 个骨骼
+<div><pre><code>// 模型确定为 24 个骨骼
 // 不同的设备对常量寄存器存储的最大数据量都是有差别的，这一点需要注意
 uniform float4x4 _Matrices[24];
 
@@ -240,16 +279,18 @@ for(int i = 0; i &lt; mesh.vertexCount; ++i)
     tangents[i].z = boneWeight.boneIndex1;
     tangents[i].w = boneWeight.weight1;
 }
-newMesh.tangents = tangents;
-</code></pre>
+newMesh.tangents = tangents;</code></pre></div>
 
-<hr />
+<hr>
 
 <p>以上就是所有的关于自己实现 GPU Skinning 的细节。没有一种方法是完美的，作为能够减少骨骼动画开销的备选方案之一，在恰当的情况下使用会大大的提高性能。</p>
 
-<blockquote><p><img src="GPUSkinning/7.gif" alt="img" /></p></blockquote>
+<blockquote>
+<p><img src="GPUSkinning/7.gif"/></p>
+</blockquote>
 
 <p><a href="GPUSkinning/GPUSkinning.zip">附 Demo 工程源码</a></p>
+
       </section>
 
 <hr/><br/><br/>
