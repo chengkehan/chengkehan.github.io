@@ -12,6 +12,36 @@
 
 ---
 
+## Rendering Learning
+
+[scratchapixel](http://www.scratchapixel.com/)
+
+[Animating With Math](http://twvideo01.ubm-us.net/o1/vault/gdc2016/Presentations/Burke_Natalie_AnimatingWithMath.pdf)
+
+[thebookofshaders](http://thebookofshaders.com/)
+
+[OGL dev Modern OpenGL Tutorials](http://ogldev.atspace.co.uk/index.html)
+
+[Learn OpenGL Your #1 Resource for OpenGL](http://learnopengl.com/)
+
+---
+
+## Pixar
+
+[Pixar in a Box](https://www.khanacademy.org/partner-content/pixar)
+
+---
+
+## GPU Gems
+
+[GPU Gems](https://developer.nvidia.com/gpugems/GPUGems/gpugems_pref01.html)
+
+[GPU Gems 2](https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_inside_front_cover.html)
+
+[GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
+
+---
+
 ## SIGGRAPH
 
 [Advances in Real-Time Rendering in 3D Graphics and Games](http://advances.realtimerendering.com/)
@@ -19,6 +49,8 @@
 [selfshadow](http://blog.selfshadow.com/)
 
 [kesen.realtimerendering.com](http://kesen.realtimerendering.com/)
+
+[Research and Development Department in tri-Ace Inc.](http://research.tri-ace.com/)
 
 ---
 
@@ -59,7 +91,7 @@
 
 ---
 
-## Dota2
+## Dota2 & Diablo
 
 [Dota 2 Workshop - Color Texture Light Baking](https://support.steampowered.com/kb/8700-SJKN-4322/dota-2-character-texture-guide)
 
@@ -67,25 +99,13 @@
 
 [DOTA 2 ITEM WORKSHOP GUIDELINES HOMEPAGE](http://www.dota2.com/workshop/)
 
----
-
-## Tricks
-
-[Animating With Math](http://twvideo01.ubm-us.net/o1/vault/gdc2016/Presentations/Burke_Natalie_AnimatingWithMath.pdf)
+[The Art of Diablo](http://gdcvault.com/play/1015306/The-Art-of-Diablo)
 
 ---
 
 ## Optimization
 
 [Performance Tunning for Tile-Based Architecture](http://www.cnblogs.com/gameknife/p/3515714.html)
-
----
-
-## OpenGL Learning
-
-[OGL dev Modern OpenGL Tutorials](http://ogldev.atspace.co.uk/index.html)
-
-[Learn OpenGL Your #1 Resource for OpenGL](http://learnopengl.com/)
 
 ---
 
@@ -99,13 +119,9 @@
 
 ---
 
-## Websites
+## Real-Time Rendering
 
 [Realtime Rendering](http://www.realtimerendering.com/)
-
-[The Art of Diablo](http://gdcvault.com/play/1015306/The-Art-of-Diablo)
-
-[Research and Development Department in tri-Ace Inc.](http://research.tri-ace.com/)
 
 ---
 
