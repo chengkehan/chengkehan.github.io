@@ -1,4 +1,4 @@
-# Sign Distance Field Learning
+# Sign Distance Field
 
 **2017-5-22**
 
