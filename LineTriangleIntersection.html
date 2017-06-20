@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html">Home</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1 id="toc_0">线段、三角形的相交检测</h1>
+
+<p><strong>2017-6-20</strong></p>
+
+<p>在 <a href="https://github.com/EpicGames/UnrealEngine">UE4</a> 的 <a href="kDopTreeInUE4.html">kDopTree</a> 相关代码中有实现了线段和三角形的相交检测。但是由于其为了加速相交检测（同时对一条线段和四个三角形做相交检测），使用了 <a href="https://en.wikipedia.org/wiki/SIMD">SIMD</a> 相关的指令，导致代码比较晦涩（相关的代码位于 kDop.h 文件中的 appLineCheckTriangleSOA 函数中）。我这里用更易懂的代码实现了一遍，原理和 UE4 的完全相同，只是由于不用为了 <a href="https://en.wikipedia.org/wiki/SIMD">SIMD</a> 去凑寄存器，所以看上去思路会更清晰一点。方便以后查阅。</p>
+
+<p><a href="https://github.com/chengkehan/Line-Triangle-Intersection">工程@github</a></p>
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
