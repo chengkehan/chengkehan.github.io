@@ -25,7 +25,7 @@ def GenerateThumb(srcPath, destpath):
 def GenerateThumbsInDir(srcDir, destDir):
 	for parent,dirnames,filenames in os.walk(srcDir):
 		for filename in filenames:
-			if filename.endswith('.jpg'):
+			if filename.endswith('.jpg') and os.path.exists(destDir + filename) == False:
 				GenerateThumb(srcDir + filename, destDir + filename)
 				jpg2whitepng(destDir + filename, destDir + filename + ".png")
 
