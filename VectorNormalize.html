@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1 id="toc_0">Vector Normalize</h1>
+
+<p><strong>2017-10-27</strong></p>
+
+<p>Unity 归一化向量，当向量的长度小于一个很小的值时，会直接返回零，不知道这样的设计是为了什么。</p>
+
+<div><pre><code>public static Vector3 Normalize (Vector3 value)
+{
+    float num = Vector3.Magnitude (value);
+    Vector3 result;
+    if (num &gt; 1E-05) {
+        result = value / num;
+    }
+    else {
+        result = Vector3.zero;
+    }
+    return result;
+}</code></pre></div>
+
+<p>今天使用一个模型的三角面的三个顶点计算法线时，就遇到了这个问题。因为三角形在模型空间坐标系中的坐标值很小，所以计算出来的法线也是一个长度很小的向量，而经过 Unity 的 Normalize 归一化后就直接变成零了，显然这是不希望得到的。所以这个时候就不能直接调用 Unity 的 Normalize 方法了，需要自己写一个：</p>
+
+<div><pre><code>private Vector3 VNormalize(Vector3 n)
+{
+    float m = n.magnitude;
+    n /= m;
+    return n;
+}</code></pre></div>
+
+<p>同样在 UE4 中也有同样的设计：</p>
+
+<div><pre><code>FORCEINLINE FVector FVector::GetSafeNormal(float Tolerance) const
+{
+    const float SquareSum = X*X + Y*Y + Z*Z;
+
+    // Not sure if it&#39;s safe to add tolerance in there. Might introduce too many errors
+    if(SquareSum == 1.f)
+    {
+        return *this;
+    }       
+    else if(SquareSum &lt; Tolerance)
+    {
+        return FVector::ZeroVector;
+    }
+    const float Scale = FMath::InvSqrt(SquareSum);
+    return FVector(X*Scale, Y*Scale, Z*Scale);
+}</code></pre></div>
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
