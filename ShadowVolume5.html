@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1 id="toc_0">Shadow Volume 5</h1>
+
+<p><strong>2017-12-28</strong></p>
+
+<h3 id="toc_1">静态阴影体的生成方法</h3>
+
+<p>生成 Shadow Volume 的方法：</p>
+
+<ul>
+<li>遍历模型的所有三角面</li>
+<li>找出所有面向光源的三角面</li>
+<li>将这些三角形的边存储到一个 List 中</li>
+<li>遍历这个 List，如果一条边重复出现两次，则删除这条边</li>
+<li>最后 List 中剩下的边即为轮廓边，利用这些轮廓边即可生成 Shadow Volume</li>
+</ul>
+
+<p>我发现以上这种方法使用于一些复杂的模型上时会出现问题，所以对上述方法进行了一定的改进</p>
+
+<ul>
+<li>遍历模型的所有三角面</li>
+<li>找出所有面向光源的三角面</li>
+<li>沿着光照方向直接投射这些三角面，形成 ShadowVolume</li>
+<li>优化投射出的 ShadowVolume，将不必要的面删除。</li>
+</ul>
+
+<p>这种方法对于很多复杂的模型同样能够得到正确的 Shadow Volume，缺点就是计算量很大，好在我这里都是离线处理静态模型。</p>
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
