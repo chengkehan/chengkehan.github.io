@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Tricks and Notes</h1>
+<p><strong>2018-4-18</strong></p>
+<p>在 Surface Shader 中输出特定值到 alpha 的方法：关闭 alphatest:_Cutoff，使用 clip(c.a - _Cutoff) 并配合 keepalpha 关键字。</p>
+<hr />
+<p>从 Unity5 开始，在 Android 上会多一步额外的 blit 操作，这步 blit 操作会因为 GPU 上的渲染分辨率不同而消耗相当的资源。之所以会多一步额外的 blit 是因为：</p>
+<blockquote>
+<p>It was done for various reasons (workaround for buggy compositors/allows alpha in frame buffer, workaround for buggy hardware scalers, better/working MSAA switching at runtime, multi-display, better match to Unity scripting APIs like Display, allows read access to backbuffer which is needed for some Unity scripting APIs).</p>
+</blockquote>
+<p>从 2017.2 开始，Android 发布设置中多了一个选项，可以选择 Blit Type 是 Always 还是 Never。 可以通过选择 Never 来避免消耗，前提是你必须清楚这确实不会影响到渲染，因为 Unity 无法根据实际的渲染需要来 Fallback。</p>
+<p>参考链接 <a href="https://forum.unity.com/threads/big-performance-issue-with-unity5-on-android.338847/">https://forum.unity.com/threads/big-performance-issue-with-unity5-on-android.338847/</a></p>
+<hr />
+<p>使用了 ImageEffectOpaque 的后处理，会在所有不透明物体渲染完成后进行，完成 ImageEffectOpaque 后再渲染透明物体。但是通过测试，ImageEffectOpaque 在部分设备上有 bug，在 ImageEffectOpaque 完成后，depthbuffer 会被 clear，导致后续透明物体的深度错乱。</p>
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
