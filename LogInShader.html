@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1>Shader 中的对数指令</h1>
+<p><strong>2018-7-3</strong></p>
+<p>Shader 中使用 pow(x,y) 指令的时候需要注意，当 x&lt;=0 时，结果可能是未定义的。其原因是，pow 指令的一种内部实现是这样的：</p>
+<pre><code>pow(x,y) =&gt; exp(y * log(x))
+</code></pre>
+
+<p>从对数函数的图像可以看出：</p>
+<blockquote>
+<img src="LogInShader/Logarithm.png" height="250"/>
+<p>图片来源  <a href="http://mathworld.wolfram.com/Logarithm.html" title="http://mathworld.wolfram.com">http://mathworld.wolfram.com/Logarithm.html</a></p>
+</blockquote>
+<p>图像是 x&gt;1 的情况，当 0&lt;x&lt;1 时图像沿 x 轴垂直翻转。 所以很明显，x&lt;=0 时未定义。</p>
+<p>pow 在最常见的 BlinnPhong 中并不存在这个问题：</p>
+<pre><code>float nh = max (0, dot (s.Normal, h));
+float spec = pow (nh, s.Specular*128.0) * s.Gloss;
+</code></pre>
+
+<p>因为 x&lt;=0 时为背面剔除的部分，所以可以忽略 x&lt;=0</p>
+
+
+
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
