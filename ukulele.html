@@ -16,6 +16,13 @@
 
     <script src="./APlayer/dist/APlayer.min.js"></script>
 
+    <!-- https://github.com/videojs/video.js#quick-start -->
+    <link href="//vjs.zencdn.net/7.0/video-js.min.css" rel="stylesheet">
+    <script src="//vjs.zencdn.net/7.0/video.min.js"></script>
+    <script>window.HELP_IMPROVE_VIDEOJS = false;</script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video-js.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.7.3/video.js"></script>
+
     <title>Jim&#39;s GameDev Blog by chengkehan</title>
   </head>
 
@@ -31,6 +38,64 @@
 
     <div class="container">
       <section id="main_content">
+
+      	<video
+		    id="my-player"
+		    class="video-js"
+		    controls
+		    preload="auto"
+		    width="400"
+		    poster="./ukulele/video3.jpg"
+		    data-setup='{}'>
+		  <source src="./ukulele/video3.mp4" type="video/mp4"></source>
+		  <p class="vjs-no-js">
+		    To view this video please enable JavaScript, and consider upgrading to a
+		    web browser that
+		    <a href="http://videojs.com/html5-video-support/" target="_blank">
+		      supports HTML5 video
+		    </a>
+		  </p>
+		</video>
+		<br><br>
+
+      	<video
+		    id="my-player"
+		    class="video-js"
+		    controls
+		    preload="auto"
+		    width="400"
+		    poster="./ukulele/video2.jpg"
+		    data-setup='{}'>
+		  <source src="./ukulele/video2.mp4" type="video/mp4"></source>
+		  <p class="vjs-no-js">
+		    To view this video please enable JavaScript, and consider upgrading to a
+		    web browser that
+		    <a href="http://videojs.com/html5-video-support/" target="_blank">
+		      supports HTML5 video
+		    </a>
+		  </p>
+		</video>
+		<br><br>
+
+      	<video
+		    id="my-player"
+		    class="video-js"
+		    controls
+		    preload="auto"
+		    width="400"
+		    poster="./ukulele/video1.jpg"
+		    data-setup='{}'>
+		  <source src="./ukulele/video1.mp4" type="video/mp4"></source>
+		  <p class="vjs-no-js">
+		    To view this video please enable JavaScript, and consider upgrading to a
+		    web browser that
+		    <a href="http://videojs.com/html5-video-support/" target="_blank">
+		      supports HTML5 video
+		    </a>
+		  </p>
+		</video>
+		<br><br>
+
         <div id="player1" class="aplayer"></div>
         <script type="text/javascript">
         	var ap = new APlayer({
