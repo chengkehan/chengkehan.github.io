@@ -51,7 +51,7 @@
     
 <script type="text/javascript">
 $.ajax( {
-    url: "LogInShader.html", 
+    url: "AxisDirAndScaleInMaya.html", 
     type: "GET", 
     success: function(data){
         var result = $(data).find("section");
@@ -89,6 +89,8 @@ $(function(){
         <div id="recent_post"></div>
         <hr class="green_dash" />
         <br>
+        <h3>2018 年 9 月</h3>
+        <a href="AxisDirAndScaleInMaya.html">统一模型的轴向和缩放</a><br><br>
 		<h3>2018 年 7 月</h3>
 		<a href="LogInShader.html">Shader 中的对数指令</a><br><br>
 		<h3>2018 年 6 月</h3>
@@ -101,6 +103,8 @@ $(function(){
 		<h3>2018 年 2 月</h3>
 		<a href="DynamicBatchingInvalid.html">Dynamic Batching 失效</a><br><br>
         <a href="HDR-Blend.html">开启 HDR 时的 Blend 注意事项</a><br><br>
+        <h3 id="older_posts" class="older_posts_class"></h3>
+        <div id="older_posts_div">
         <h3>2017 年 12 月</h3>
         <a href="ShadowVolume5.html">Shadow Volume 5</a><br><br>
         <a href="ShadowVolume4.html">Shadow Volume 4</a><br><br>
@@ -148,8 +152,6 @@ $(function(){
         <a href="ScreenSpaceReflection2.html">Screen Space Reflection 2</a><br><br>
         <a href="SVPositionInFragment.html">记录问题一则</a><br><br>
         <a href="ScreenSpaceReflection.html">Screen Space Reflection</a><br><br>
-        <h3 id="older_posts" class="older_posts_class"></h3>
-        <div id="older_posts_div">
         <h3>2016 年 12 月</h3>
         <a href="SimpleShadow.html">整理并扩展一个阴影渲染的实现</a><br><br>
         <a href="DeferredShading.html">初试 Deferred Shading</a><br><br>
