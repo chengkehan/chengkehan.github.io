@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+
+<h1 id="toc_0">FBX 导入丢失动作</h1>
+
+<p><strong>2018-10-5</strong></p>
+
+<p>在把一个 FBX 动作模型导入 Unity 之后，发现部分骨骼的动作缺失了，一开始没有注意到 Unity 的 Error 信息（习惯新的 clear 掉了一大堆打印信息），以为是 Maya 导出时的设置有问题，在 Maya 中看到一条 Warning，根据 Warning 的信息找了很久未果。</p>
+
+<p><img src="FBXImportError/1.jpg" alt=""></p>
+
+<p>其实在使用 Maya 打开这个文件的时候就有异常，文件内容本身不多，Outliner 结构也很简单，可是打卡文件会卡顿很久。</p>
+
+<p>当再次导入 FBX 时看到一条 Unity 的 Error 信息。</p>
+
+<div><pre><code>ImportFBX Errors:
+Time range (447397) for rotation curve(s) on node &#39;Bone09&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.
+Time range (447397) for scale curve(s) on node &#39;Bone01&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.
+Time range (447397) for scale curve(s) on node &#39;Bone09&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.
+Time range (447397) for translation curve(s) on node &#39;Bone01&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.
+Time range (447397) for translation curve(s) on node &#39;Bone09&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.
+Time range (447399) for rotation curve(s) on node &#39;Bone01&#39; on take &#39;Take 001&#39; larger than maximum allowed (100000). These curves won&#39;t be imported. Check your file - it most likely has keys in far negative or positive timeline.</code></pre></div>
+
+<p>Google 后查到了解决方法，<a href="https://answers.unity.com/questions/372425/error-importing-fbx.html">https://answers.unity.com/questions/372425/error-importing-fbx.html</a>。于是在 Maya 中选中对应的骨骼，打开 Graph Editor 检查。确实在时间轴的负方向很远的地方有动作信息。</p>
+
+<p><img src="FBXImportError/2.jpg" alt=""></p>
+
+<p>将这些动作信息删除后就解决了动作缺失的问题了，同时 Maya 的 Warning 和打开文件卡顿也消失了。</p>
+
+
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
