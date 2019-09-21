@@ -1,0 +1,13 @@
+{
+"companyName": "Unity Technologies",
+"productName": "Viking Village",
+"dataUrl": "Bin_WebGL.data.unityweb",
+"asmCodeUrl": "Bin_WebGL.asm.code.unityweb",
+"asmMemoryUrl": "Bin_WebGL.asm.memory.unityweb",
+"asmFrameworkUrl": "Bin_WebGL.asm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}
