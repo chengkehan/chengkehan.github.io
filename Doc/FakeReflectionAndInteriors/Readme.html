@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<title>Readme</title>
+
+
+<style type="text/css">
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+ol,
+ul,
+li,
+img {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+html * {
+  font-family: "ff-din-web-pro-1", "ff-din-web-pro-2", sans-serif;
+  font-size: 16px;
+  line-height: 19.2px;
+  color-profile: sRGB;
+}
+body {
+  margin: 40px 70px;
+}
+p {
+  font-weight: lighter;
+  margin-bottom: 20px;
+}
+strong {
+  font-weight: bold;
+}
+ol,
+ul {
+  margin-left: 2em;
+  margin-bottom: 20px;
+}
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  margin-top: 10px;
+}
+li {
+  margin-bottom: 10px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: lighter;
+  text-transform: capitalize;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+h1 {
+  font-size: 24.624px;
+  line-height: 29.548799999999996px;
+}
+h2 {
+  font-size: 24.624px;
+  line-height: 29.548799999999996px;
+}
+h3 {
+  font-size: 23.44px;
+  line-height: 28.128px;
+}
+h4 {
+  font-size: 22.16px;
+  line-height: 26.592px;
+}
+h5 {
+  font-size: 22.16px;
+  line-height: 26.592px;
+}
+h6 {
+  font-size: 22.16px;
+  line-height: 26.592px;
+}
+img {
+  margin-bottom: 20px;
+}
+h1 img,
+h2 img,
+h3 img,
+h4 img,
+h5 img,
+h6 img,
+p img {
+  margin-bottom: 0;
+}
+pre {
+  margin-bottom: 20px;
+}
+pre,
+code {
+  font-family: monospace;
+}
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 15px;
+}
+blockquote {
+  border-left: 4px solid;
+  padding: 0 15px;
+}
+blockquote > :first-child {
+  margin-top: 0;
+}
+blockquote > :last-child {
+  margin-bottom: 15px;
+}
+h1 {
+  text-transform: uppercase;
+  font-weight: bold;
+  border-bottom: 1px solid;
+}
+h2 {
+  border-bottom: 1px solid;
+}
+h3,
+h4,
+h5,
+h6 {
+  border-bottom: none;
+}
+html * {
+  color: #657b83;
+}
+html body {
+  background-color: #fdf6e3;
+}
+html h1,
+html h2,
+html h3,
+html h4,
+html h5,
+html h6 {
+  color: #586e75;
+  border-color: #657b83;
+}
+html a,
+html a:active,
+html a:visited {
+  color: #586e75;
+}
+html a:hover {
+  background-color: #eee8d5;
+}
+html pre {
+  color: #586e75;
+  background-color: #eee8d5;
+}
+html a,
+html a:active,
+html a:visited,
+html code.url {
+  color: #b58900;
+}
+html h1 {
+  color: #b58900;
+}
+html h2,
+html h3,
+html h4,
+html h5,
+html h6 {
+  color: #b58900;
+}
+
+@media print {
+  body {
+    margin: 0;
+  }
+  * {
+    color: #000 !important;
+  }
+}
+</style>
+
+
+</head>
+
+<body>
+
+<h1 id="toc_0">Fake Reflection And Interiors</h1>
+
+<h2 id="toc_1">Introduction</h2>
+
+<p>This tool is used for simulating interiors and reflection with a Cubemap. We baked static object into a cubemap to simulate interiors and reflection. Compared to realtime interiors/reflection rendering, we will get a low overhead and high quality inteirors/reflection effect.</p>
+
+<h2 id="toc_2">Demos</h2>
+
+<p><a href="https://chengkehan.github.io/Bin/FakeInterior/DemoWin.zip">Fake Interior Demo Windows</a></p>
+
+<p><a href="https://chengkehan.github.io/Bin/FakeInterior/DemoMac.zip">Fake Interior Demo Mac</a></p>
+
+<p><img src="./Imgs/1.jpg" width="200px"/>
+<img src="./Imgs/2.jpg" width="200px"/>
+<img src="./Imgs/3.jpg" width="200px"/></p>
+
+<p>In this demo scene, there is an empty house, we use this tool to simulate a fake interior. As you can see, It&#39;s almost real. You can&#39;t see any artificiality even if you&#39;re close enough. We also add distortion and frosted glass effect to windows.</p>
+
+<p><a href="https://chengkehan.github.io/Bin/FakeReflection/DemoWin.zip">Fake Reflection Demo Windows</a></p>
+
+<p><a href="https://chengkehan.github.io/Bin/FakeReflection/DemoMac.zip">Fake Reflection Demo Mac</a></p>
+
+<p><img src="./Imgs/4.jpg" width="200px"/>
+<img src="./Imgs/5.jpg" width="200px"/></p>
+
+<p>In thie demo scene, we use this tool to simulate reflection of water.</p>
+
+<h2 id="toc_3">Parameters</h2>
+
+<p><img src="./Imgs/6.png" width="300px"/></p>
+
+<p><strong>Center, Size, Size Scale</strong></p>
+
+<p><code>These parameters are used to control size of yellow box. Different sizes of yellow boxes will give different results.</code></p>
+
+<p><img src="./Imgs/7.png" width="300px"/></p>
+
+<p><strong>Two Side</strong></p>
+
+<p><code>Cull Back or Cull Off</code></p>
+
+<p><strong>Forward Asix</strong></p>
+
+<p><code>The forward axis in object&#39;s coordinate space</code></p>
+
+<p><strong>Is Local</strong></p>
+
+<p><code>Normal Cubemap mode or Local Cubemap mode</code></p>
+
+<p><img src="./Imgs/8.png" width="300px"/>
+<img src="./Imgs/9.png" width="300px"/></p>
+
+<p><strong>Inner Simulateion</strong></p>
+
+<p><code>Reflection mode or Interior mode</code></p>
+
+<p><img src="./Imgs/10.png" width="300px"/>
+<img src="./Imgs/11.png" width="300px"/></p>
+
+<p><strong>Roughness</strong></p>
+
+<p><code>Roughness of surface</code></p>
+
+<p><img src="./Imgs/12.png" width="300px"/></p>
+
+<p><strong>Is Object Space</strong></p>
+
+<p><code>Calculate fake reflection and interior in world space or object space</code></p>
+
+<p><img src="./Imgs/13.gif" width="300px"/>
+<img src="./Imgs/14.gif" width="300px"/></p>
+
+<p><strong>Bump Texture, Bump Intensity, Bump Scale, Bump ...</strong></p>
+
+<p><code>Add waves to surface</code></p>
+
+<p><img src="./Imgs/15.png" width="300px"/>
+<img src="./Imgs/16.png" width="300px"/></p>
+
+<p><img src="./Imgs/17.png" width="300px"/>
+<img src="./Imgs/18.png" width="300px"/></p>
+
+
+
+<script type="text/x-mathjax-config">
+if (typeof MathJaxListener !== 'undefined') {
+  MathJax.Hub.Register.StartupHook('End', function () {
+    MathJaxListener.invokeCallbackForKey_('End');
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+</body>
+
+</html>
