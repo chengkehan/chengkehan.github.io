@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+
+    <link rel="stylesheet" href="highlight/styles/monokai.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$$$','$$$'], ['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <title>Jim&#39;s GameDev Blog by chengkehan</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Jim&#39;s GameDev Blog</h1>
+        <h2></h2>
+        <a href="index.html"><img src="icons/home_icon.png" height="22px" title="Home"></a>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+<h1 id="toc_0">游戏开发中模糊逻辑1</h1>
+
+<p><strong>2023-10-16</strong></p>
+
+<p><a href="">https://github.com/chengkehan/FuzzyLogic</a></p>
+
+<p>前段时间，开发了一个编辑器工具，以便在游戏中使用模糊逻辑来编辑 NPC 的数值计算。根据我个人的理解，模糊逻辑其实并不能算是真正的人工智能，而只是让角色看起来有智能，或者说让数值避免过多的出现人为设定的痕迹。在这里我对已经应用于游戏开发中的本工具作一个简单的定义，可视化的、感性的数值（公式）设计工具。具体什么意思，希望通过下面的讲解，能把问题说明白。</p>
+
+<p>这里就从一个简单的例子来说明。在游戏中，我们需要计算 NPC 对于主角的好感度，这里就使用模糊逻辑的思维方式来看看，如何进行设计。</p>
+
+<p>首先，最终的好感度数值是由两个因素影响的，正向增加好感和负向减少好感。那么在模糊逻辑中最终的输出就会像下图这样。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev1.png" alt=""></p>
+
+<p>红色区域的面积表示负向减好感度，绿色区域的面积表示正向加好感度。而中间白色的点，是红色区域和绿色区域的重心点，也就是最终好感度的输出值。我们只看白点在 x 轴上的值，在上图中最终的好感度输出值为 50。至于这个输出值的单位（或者说意义）是什么，就需要看需求的定义了，在我们的游戏中，0 为完全无好感，100 为满好感。</p>
+
+<p>通过观察上面的图，你也许已经发现了问题。无论红色区域的面积被如何压缩，即使红色区域完全消失，好感度也永远无法达到满好感的程度。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev2.gif" alt=""></p>
+
+<p>也就说是白色重心点的 x 坐标不可能达到 100。在有些系统的设计中，这或许会被当做一种特性来使用，但在我们的好感度系统重，明显不能这么做。当然我们也不能简单的将最终的输出的最大值和最小值重新映射回 0 到 100 的范围内，因为最大值和最小值会随着红色和绿色梯形上下两边的变动而发生改变。所以经过重新设计后，模糊逻辑的最终输出图像会类似下面这样。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev3.png" alt=""></p>
+
+<p>经过调整后，当红色梯形的面积被压缩到 0 后，白色重心点就会恰好落在 x 坐标为 100 的地方。同理当绿色梯形的面积被压缩到 0 后，白色重心点的就会恰好落在 x 坐标为 0 的地方。这样，就可以达到无好感和满好感的效果。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev4.gif" alt=""></p>
+
+<p>接下来我们分析一下哪些因素会影响到正向的增加好感度。在游戏中，对话和礼物都是最基本的会影响到正向好感度的设定，还有例如达成 NPC 交代的任务等等。这里就以这几个为例，看一下怎么使用模糊逻辑来设计。</p>
+
+<p>首先是对话。常见的设定是对话的频率，NPC 都会有自己的性格，不同的性格所能接受的对话频率会有差异，所以玩家需要通过对 NPC 的了解，选择合适的频率进行对话，才能最大限度的增加好感度。当然如果游戏里有一个社恐类型的 NPC，过度对话反而会减好感度，那么这个设定就应该放在负向减好感度，而不是这里。</p>
+
+<p>在设计不同性格的 NPC 所对应的对话频率之前，我们先来设计一个均衡类型的，也就是说这个 NPC 的性格不会太极端，不是社牛，也不是社恐，在数值上不会太激进。从表现上来看，玩家以一个正常的对话节奏，就能获得稳定的正向好感度增加。如果玩家与这个 NPC 对话的多，那么就会有更多的正向好感度增加。如果玩家与这个 NPC 对话的少，那么正向好感度就增加的少。两者是线性关系。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev5.gif" alt=""></p>
+
+<p>从图中可以看到，随着对话频率的增加，红色的低频数值越来越小，最后逐渐趋近于零，而绿色的高频数值最后趋近于一。有了红色和绿色这两个数值后，就需要将它们和当前模糊逻辑的输出关联起来，形成一个叫做“对话频率-好感度-正向效果”的输出。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev6.png" alt=""></p>
+
+<p>这里，我们将红色和绿色两个频率的输出直接连接到当前模糊逻辑总输出端上的两个接口上。最后就得到了如下图所示的效果。</p>
+
+<p><img src="FuzzyLogicInDev/FuzzyLogicInDev7.gif" alt=""></p>
+
+<p>当对话频率很低的时候，对好感度的正向效果也很小，黄色梯形的面积远大于蓝色梯形的面积，所以白色重心点的输出值接近零。当绘画评率逐渐变高，对好感度的正向效果也逐渐变大，黄色梯形的面积和蓝色梯形的面积的变化，也导致了整个图形的重心发生了变化。这样就得到了一个最基本的关于“对话频率-好感度-正向效果”的模糊逻辑。</p>
+
+<p>下面我们会在此基础上设计几个有自己个性的 NPC，他们的数值就不会像上面那样线性了。</p>
+
+<p>Coming Soon ...</p>
+
+      </section>
+
+<hr/><br/><br/>
+      
+    </div>
+  </body>
+</html>
