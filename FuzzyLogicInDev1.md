@@ -2,7 +2,7 @@
 
 **2023-10-16**
 
-[https://github.com/chengkehan/FuzzyLogic]()
+[https://github.com/chengkehan/FuzzyLogic](https://github.com/chengkehan/FuzzyLogic)
 
 前段时间，开发了一个编辑器工具，以便在游戏中使用模糊逻辑来编辑 NPC 的数值计算。根据我个人的理解，模糊逻辑其实并不能算是真正的人工智能，而只是让角色看起来有智能，或者说让数值避免过多的出现人为设定的痕迹。在这里我对已经应用于游戏开发中的本工具作一个简单的定义，可视化的、感性的数值（公式）设计工具。具体什么意思，希望通过下面的讲解，能把问题说明白。
 
